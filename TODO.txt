@@ -1,0 +1,5 @@
+- implement collision rules, as descired in readme
+
+
+
+- profiler to determine where to optimize for speed
