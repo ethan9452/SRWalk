@@ -1,7 +1,7 @@
 # Simulation Specification
 
 ## Demo
-![](demo/demo.gif | width = 600)
+![](demo/demo.gif | width=600)
 
 ## Collision Rules 
 Should be fair (point's order in list shouldn't affect outcome)
