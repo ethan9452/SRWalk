@@ -1,5 +1,6 @@
 package walk.display;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,10 +30,14 @@ public class TextFieldWithSubmitButton extends JButton
 	
 	public void addToPanel( JPanel p )
 	{
-		p.add( label );
-		p.add( inputField );
-		p.add( this );
+		JPanel panel = new JPanel();
+		panel.setBorder( BorderFactory.createEmptyBorder() );		
+		
+		panel.add( label );
+		panel.add( inputField );
+		panel.add( this );
 
+		p.add(panel);
 	}
 
 }

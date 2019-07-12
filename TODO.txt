@@ -3,3 +3,9 @@
 
 
 - profiler to determine where to optimize for speed
+
+
+
+- maybe a intermediate object between sim-state models and the view
+    - https://gameprogrammingpatterns.com/component.html
+    

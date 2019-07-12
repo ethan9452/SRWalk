@@ -26,7 +26,7 @@ public class WalkSimulator
 
 	private List<Point>				currentPoints;
 
-	private int						iterCount		= 0;
+	private int						iterCount								= 0;
 
 	private boolean					isCollisionsOn;
 	private boolean					isReset;
@@ -34,12 +34,16 @@ public class WalkSimulator
 	// TODO: these variables are all "derived" from the simulation state, and
 	// are for UI purposes only. maybe move out to anohter class
 	private Map<Point, Integer>		pointsVisitedCount;
-	private Map<Point, Double>		heatMapWeights	= new HashMap<>();
+	private Map<Point, Double>		heatMapWeights							= new HashMap<>();
 
 	private int						biggestX;
 	private int						smallestX;
 	private int						biggestY;
 	private int						smallestY;
+
+	private int						framesToAverageOverForFpsCalculation	= 10;
+	private long					lastFpsMeasureTimeMs;
+	private double						actualFps;
 
 	public WalkSimulator( IRandomChoiceProvidor providor )
 	{
@@ -81,6 +85,9 @@ public class WalkSimulator
 		biggestY = 0;
 		smallestX = 0;
 		smallestY = 0;
+
+		lastFpsMeasureTimeMs = System.currentTimeMillis();
+		actualFps = 0;
 
 		iterCount = 0;
 
@@ -187,7 +194,7 @@ public class WalkSimulator
 
 	public void step()
 	{
-		
+
 		recordCurrentPoint();
 		makeRandomStep();
 
@@ -197,6 +204,8 @@ public class WalkSimulator
 
 	private void makeRandomStep()
 	{
+		updateActualFps();
+
 		if ( isCollisionsOn )
 		{
 			// TODO can def optimize, and clean
@@ -241,19 +250,19 @@ public class WalkSimulator
 
 					int x = currentPoints.get( i ).x;
 					int y = currentPoints.get( i ).y;
-					
+
 					Point chosenMove = possibleMoves.get( choice );
-					
+
 					x += chosenMove.x;
 					y += chosenMove.y;
-					
-					currentPoints.get(i).move( x, y );
+
+					currentPoints.get( i ).move( x, y );
 
 					biggestX = Math.max( x, biggestX );
 					biggestY = Math.max( y, biggestY );
 					smallestX = Math.min( x, smallestX );
 					smallestY = Math.min( y, smallestY );
-					
+
 					// jesus christtt
 				}
 			}
@@ -295,6 +304,26 @@ public class WalkSimulator
 
 	}
 
+	private void updateActualFps()
+	{
+		if ( iterCount % framesToAverageOverForFpsCalculation == 0 )
+		{
+			final long currentTimeMs = System.currentTimeMillis() ;
+			long timePassed = currentTimeMs - lastFpsMeasureTimeMs;
+			
+			if ( timePassed == 0 )
+			{
+				timePassed  = 1;
+			}
+
+			// I hope currentTime - lastMeasuredTime would never bust out of
+			// int...
+			actualFps = ((double) framesToAverageOverForFpsCalculation / (double) timePassed ) * 1000;
+
+			lastFpsMeasureTimeMs = currentTimeMs;
+		}
+	}
+
 	private void recordCurrentPoint()
 	{
 		for ( Point currentPoint : currentPoints )
@@ -311,6 +340,11 @@ public class WalkSimulator
 		}
 	}
 
+	public boolean getIsCollisionOn()
+	{
+		return isCollisionsOn;
+	}
+	
 	public void turnCollisionOff()
 	{
 		isCollisionsOn = false;
@@ -321,6 +355,9 @@ public class WalkSimulator
 		if ( isReset )
 		{
 			isCollisionsOn = true;
+			
+			// NOTE: this is a bit hacky. this is to imediatly un-collide the walkers 
+			resetSimulationState();
 		}
 		else
 		{
@@ -356,6 +393,11 @@ public class WalkSimulator
 	public int getSmallestY()
 	{
 		return smallestY;
+	}
+
+	public double getActualFps()
+	{
+		return actualFps;
 	}
 
 	public List<Point> getCurrentPoints()

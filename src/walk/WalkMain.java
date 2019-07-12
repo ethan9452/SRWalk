@@ -3,7 +3,10 @@ package walk;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
+import javax.swing.JToggleButton;
 import javax.swing.SpinnerModel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -28,7 +31,7 @@ public class WalkMain implements ActionListener
 	private final static int	DEFAULT_SIMULATION_DISPLAY_SCALE	= 1;
 
 	private static final int	DEFAULT_TIMER_DELAY					= 5;
-	private static final int	MAX_TIMER_DELAY						= 100;
+	private static final int	MAX_TIMER_DELAY						= 1000;
 	private static final int	MIN_TIMER_DELAY						= 1;
 
 	static int					DEFAULT_SIMULATION_CLOCK_SPEED_MS	= 100;
@@ -43,12 +46,10 @@ public class WalkMain implements ActionListener
 	{
 		simulator = new WalkSimulator();
 		display = new SimulationDisplay( simulator, SIMULATION_DISPLAY_PIXELS, DEFAULT_SIMULATION_DISPLAY_SCALE );
-		menuBar = new MenuBarDisplay( simulator, MENU_BAR_WIDTH,
+		menuBar = new MenuBarDisplay( this, simulator, MENU_BAR_WIDTH,
 				Math.max( MENU_BAR_MIN_HEIGHT, SIMULATION_DISPLAY_PIXELS ) );
 
 		timer = new Timer( DEFAULT_SIMULATION_CLOCK_SPEED_MS, this );
-
-	
 
 		EventQueue.invokeLater( () ->
 		{
@@ -56,17 +57,14 @@ public class WalkMain implements ActionListener
 			final int height = Math.max( SIMULATION_DISPLAY_PIXELS, MENU_BAR_MIN_HEIGHT );
 
 			DisplayFrame ex = new DisplayFrame( display, menuBar, width, height, SIMULATION_DISPLAY_PIXELS );
-			
+
 			registerMenuButtons();
 			menuBar.addStatsDisplays();
-			
-//			menuBar.validate();
-//			ex.validate();
+			menuBar.finishDisplaySetting();
+			// menuBar.validate();
+			// ex.validate();
 		} );
 
-		
-	
-		
 	}
 
 	private void registerMenuButtons()
@@ -98,6 +96,38 @@ public class WalkMain implements ActionListener
 				resetSimulation();
 				menuBar.updateStatsDisplays();
 				menuBar.repaint();
+			}
+		} );
+
+		menuBar.registerToggleButton( "Collisions", new ItemListener()
+		{
+			@Override
+			public void itemStateChanged( ItemEvent e )
+			{
+				if ( e.getStateChange() == ItemEvent.SELECTED )
+				{
+					simulator.turnCollisionOn();
+
+					// This is to prevent a state where `turnCollisionOn` fails,
+					// but the button is still toggled
+					if ( !simulator.getIsCollisionOn() )
+					{
+						JToggleButton source = (JToggleButton) e.getSource();
+						source.setSelected( false );
+					}
+
+					menuBar.updateStatsDisplays();
+					menuBar.repaint();
+					display.repaint();
+				}
+				else
+				{
+					simulator.turnCollisionOff();
+					menuBar.updateStatsDisplays();
+					menuBar.repaint();
+					display.repaint();
+				}
+
 			}
 		} );
 
@@ -137,6 +167,7 @@ public class WalkMain implements ActionListener
 
 						source.setTextFieldValue( Integer.toString( timerDelayMs ) );
 
+						menuBar.updateStatsDisplays();
 						display.repaint();
 						menuBar.repaint();
 					}
@@ -210,8 +241,8 @@ public class WalkMain implements ActionListener
 				System.out.println( "Iter: " + i + " / " + iterations );
 
 				// TODO: come up with a way to display progress
-//				menuBar.updateStatsDisplays();
-//				menuBar.paintImmediately( 0, 0, 200, 800 );
+				// menuBar.updateStatsDisplays();
+				// menuBar.paintImmediately( 0, 0, 200, 800 );
 			}
 		}
 
@@ -231,6 +262,12 @@ public class WalkMain implements ActionListener
 		display.repaint();
 
 		menuBar.repaint();
+	}
+
+	////// UI Getters
+	public int getTimerDelayMs()
+	{
+		return timer.getDelay();
 	}
 
 	public static void main( String[] args )

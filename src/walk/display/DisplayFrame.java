@@ -1,4 +1,7 @@
 package walk.display;
+
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -18,9 +21,13 @@ public class DisplayFrame extends JFrame
 		add( display );
 		display.setSize( simulationDisplayPixels, simulationDisplayPixels );
 		display.setLocation( 0, 0 );
-		
+		display.setDoubleBuffered( true ); // this should make it render
+											// better!!!!!
 
-		setSize( widthPixels, heightPixels );
+		// in the JFrame, the menu bar actually takes up some space, so the
+		// context pane is the size we wanna set.
+		this.getContentPane().setPreferredSize( new Dimension( widthPixels, heightPixels ) );
+		pack();
 
 		setTitle( "walkooo" );
 		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
