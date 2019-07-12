@@ -18,6 +18,7 @@ public class DisplayFrame extends JFrame
 		add( display );
 		display.setSize( simulationDisplayPixels, simulationDisplayPixels );
 		display.setLocation( 0, 0 );
+		
 
 		setSize( widthPixels, heightPixels );
 

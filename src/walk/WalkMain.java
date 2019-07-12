@@ -48,9 +48,7 @@ public class WalkMain implements ActionListener
 
 		timer = new Timer( DEFAULT_SIMULATION_CLOCK_SPEED_MS, this );
 
-		registerMenuButtons();
-		menuBar.addStatsDisplays();
-		menuBar.validate();
+	
 
 		EventQueue.invokeLater( () ->
 		{
@@ -58,8 +56,17 @@ public class WalkMain implements ActionListener
 			final int height = Math.max( SIMULATION_DISPLAY_PIXELS, MENU_BAR_MIN_HEIGHT );
 
 			DisplayFrame ex = new DisplayFrame( display, menuBar, width, height, SIMULATION_DISPLAY_PIXELS );
+			
+			registerMenuButtons();
+			menuBar.addStatsDisplays();
+			
+//			menuBar.validate();
+//			ex.validate();
 		} );
 
+		
+	
+		
 	}
 
 	private void registerMenuButtons()

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,8 +39,9 @@ public class MenuBarDisplay extends JPanel
 
 		this.simulator = simulator;
 
+//		setLayout( new BoxLayout(this, BoxLayout.PAGE_AXIS) );
 		setBackground( Color.white );
-		setLayout( new FlowLayout() );
+		
 
 		biggestX = new JLabel( "Biggest X:" );
 		biggestY = new JLabel( "Biggest Y:" );
@@ -51,17 +53,30 @@ public class MenuBarDisplay extends JPanel
 
 	public void addStatsDisplays()
 	{
-		// TODO get this to work
-		// JPanel statsPanel = new JPanel();
-		// add(statsPanel);
-		// statsPanel.setBackground( BG_COLOR );
-		// statsPanel.add( biggestX );
-		// statsPanel.add( biggestY );
-		// statsPanel.add( smallestX );
-		// statsPanel.add( smallestY );
-		// statsPanel.add( numWalkers );
-		// statsPanel.add( iterCount );
-
+//		 TODO get this to work
+//		 JPanel statsPanel = new JPanel();
+//		 
+//		 
+//		 System.out.println( "23rwefds" );
+//		 System.out.println( statsPanel.getPreferredSize() );
+//		 System.out.println( statsPanel.getMaximumSize() );
+//		 System.out.println( statsPanel.getMinimumSize() );
+//		 System.out.println( statsPanel.getLayout() );
+//		 System.out.println( this.getLayout() );
+//		 
+//		 statsPanel.setBackground( BG_COLOR );
+//		 statsPanel.add( biggestX );
+//		 statsPanel.add( biggestY );
+//		 statsPanel.add( smallestX );
+//		 statsPanel.add( smallestY );
+//		 statsPanel.add( numWalkers );
+//		 statsPanel.add( iterCount );
+//
+//		 add(statsPanel);
+//		 
+		 
+		 
+		 
 		add( biggestX );
 		add( biggestY );
 		add( smallestX );
