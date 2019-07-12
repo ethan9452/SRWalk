@@ -1,5 +1,4 @@
-- implement collision rules, as descired in readme
-
+- make page resiziable
 
 
 - profiler to determine where to optimize for speed
