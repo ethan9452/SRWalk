@@ -1,7 +1,7 @@
 # Simulation Specification
 
-## TODO
-.....
+## Demo
+![](demo/demo.gif)
 
 ## Collision Rules 
 Should be fair (point's order in list shouldn't affect outcome)
