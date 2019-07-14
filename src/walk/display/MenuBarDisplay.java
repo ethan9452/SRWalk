@@ -47,6 +47,8 @@ public class MenuBarDisplay extends JPanel
 	private final int				widthPixels;
 	private final int				heightPixels;
 
+	private JPanel statsPanel;
+	
 	private JLabel					biggestX;
 	private JLabel					biggestY;
 	private JLabel					smallestX;
@@ -67,7 +69,7 @@ public class MenuBarDisplay extends JPanel
 
 		BoxLayout layoutManager = new BoxLayout( this, BoxLayout.PAGE_AXIS );
 		setLayout( layoutManager );
-		setBorder( BorderFactory.createEmptyBorder( 10, 0, 10, 0 ) );
+//		setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
 
 		biggestX = new JLabel( "Biggest X:" );
 		biggestY = new JLabel( "Biggest Y:" );
@@ -83,7 +85,7 @@ public class MenuBarDisplay extends JPanel
 	public void finishDisplaySetting()
 	{
 		// TODO: this is a hack so that this shit on the bottom doesn't get cut off. (border didn't work well - which is weird)
-		add( new JPanel() );
+//		add( new JPanel() );
 
 		// Set background color for all children
 		synchronized ( getTreeLock() )
@@ -95,6 +97,8 @@ public class MenuBarDisplay extends JPanel
 				Component curComponent = stack.pop();
 
 				curComponent.setBackground( Color.white );
+				curComponent.revalidate();
+				curComponent.repaint();
 
 				if ( curComponent instanceof Container )
 				{
@@ -112,7 +116,8 @@ public class MenuBarDisplay extends JPanel
 	public void addStatsDisplays()
 	{
 		JPanel statsPanel = new JPanel( new GridLayout( 1, 2, 0, 0 ) );
-
+//		statsPanel.setBorder( BorderFactory.createEmptyBorder( 0,0,10,0 ) );
+		
 		JPanel left = new JPanel();
 		JPanel right = new JPanel();
 
@@ -137,9 +142,14 @@ public class MenuBarDisplay extends JPanel
 
 		statsPanel.add( left );
 		statsPanel.add( right );
+		
+		// TODO this is to fit all the labels. maybe can make it more general ifthis probelm comes up a lot
+		statsPanel.setPreferredSize( new Dimension( widthPixels, 70 ) );
 
 		add( statsPanel );
-
+		
+		this.statsPanel = statsPanel;
+		debugLocationPrint( biggestX );
 	}
 
 	public void updateStatsDisplays()
@@ -218,6 +228,12 @@ public class MenuBarDisplay extends JPanel
 		panel.add( s.getTextField() );
 
 		add( panel );
+	}
+	
+	public void debugLocationPrint( Component component )
+	{
+		System.out.println( "top left: " + component.getLocation() + " size: " + component.getSize() + " preffered size: " + 
+				component.getPreferredSize() + " min size " + component.getMinimumSize() + " max size " + component.getMaximumSize() );
 	}
 
 }
