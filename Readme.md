@@ -3,6 +3,13 @@
 ## Demo
 <img src="demo/demo.gif" data-canonical-src="" width="600"  />
 
+## TODO
+[https://docs.google.com/document/d/1ZiuWXCt2R6VJhi4gJ9Ioh0zyY4dZL7d4ZuxnsBEnp2w/edit?usp=sharing](https://docs.google.com/document/d/1ZiuWXCt2R6VJhi4gJ9Ioh0zyY4dZL7d4ZuxnsBEnp2w/edit?usp=sharing)
+
+## Description
+
+## Simulation Rules
+
 ## Collision Rules 
 Should be fair (point's order in list shouldn't affect outcome)
 

@@ -175,12 +175,13 @@ public class MenuBarDisplay extends JPanel
 		b.addActionListener( buttonCallback );
 	}
 	
-	public void registerToggleButton( String name , ItemListener callback )
+	public void registerToggleButton( String name , boolean startingState, ActionListener callback )
 	{
 		JToggleButton b = new JToggleButton(name);
+		b.setSelected( startingState );
 		b.setAlignmentX( Component.CENTER_ALIGNMENT );
 		add(b);
-		b.addItemListener( callback );
+		b.addActionListener( callback );
 	}
 
 	public void registerSpinnerWithLabel( String name, int min, int max, int start, ChangeListener spinnerCallback )

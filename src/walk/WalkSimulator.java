@@ -43,7 +43,7 @@ public class WalkSimulator
 
 	private int						framesToAverageOverForFpsCalculation	= 10;
 	private long					lastFpsMeasureTimeMs;
-	private double						actualFps;
+	private double					actualFps;
 
 	public WalkSimulator( IRandomChoiceProvidor providor )
 	{
@@ -308,17 +308,17 @@ public class WalkSimulator
 	{
 		if ( iterCount % framesToAverageOverForFpsCalculation == 0 )
 		{
-			final long currentTimeMs = System.currentTimeMillis() ;
+			final long currentTimeMs = System.currentTimeMillis();
 			long timePassed = currentTimeMs - lastFpsMeasureTimeMs;
-			
+
 			if ( timePassed == 0 )
 			{
-				timePassed  = 1;
+				timePassed = 1;
 			}
 
 			// I hope currentTime - lastMeasuredTime would never bust out of
 			// int...
-			actualFps = ((double) framesToAverageOverForFpsCalculation / (double) timePassed ) * 1000;
+			actualFps = ((double) framesToAverageOverForFpsCalculation / (double) timePassed) * 1000;
 
 			lastFpsMeasureTimeMs = currentTimeMs;
 		}
@@ -344,24 +344,25 @@ public class WalkSimulator
 	{
 		return isCollisionsOn;
 	}
-	
+
 	public void turnCollisionOff()
 	{
 		isCollisionsOn = false;
 	}
 
-	public void turnCollisionOn()
+	public void tryTurnCollisionOn()
 	{
 		if ( isReset )
 		{
 			isCollisionsOn = true;
-			
-			// NOTE: this is a bit hacky. this is to imediatly un-collide the walkers 
+
+			// NOTE: this is a bit hacky. this is to imediatly un-collide the
+			// walkers
 			resetSimulationState();
 		}
 		else
 		{
-			System.out.println( "ERROR: cannot turn on collisions unless sim is reset" );
+			System.out.println( "INFO: cannot turn on collisions unless sim is reset" );
 		}
 	}
 

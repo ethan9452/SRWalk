@@ -28,19 +28,19 @@ public class WalkMain implements ActionListener
 
 	private static final int	MAX_SIMULATION_DISPLAY_SCALE		= 100;
 	private static final int	MIN_SIMULATION_DISPLAY_SCALE		= 1;
-	private final static int	DEFAULT_SIMULATION_DISPLAY_SCALE	= 1;
+	private final static int	DEFAULT_SIMULATION_DISPLAY_SCALE	= 40;
 
-	private static final int	DEFAULT_TIMER_DELAY					= 5;
 	private static final int	MAX_TIMER_DELAY						= 1000;
 	private static final int	MIN_TIMER_DELAY						= 1;
-
-	static int					DEFAULT_SIMULATION_CLOCK_SPEED_MS	= 100;
+	private static final int	DEFAULT_TIMER_DELAY					= 80;
 
 	private SimulationDisplay	display;
 	private MenuBarDisplay		menuBar;
 	private WalkSimulator		simulator;
 
 	private Timer				timer;
+	
+	private boolean isRenderOn;
 
 	public WalkMain()
 	{
@@ -49,8 +49,10 @@ public class WalkMain implements ActionListener
 		menuBar = new MenuBarDisplay( this, simulator, MENU_BAR_WIDTH,
 				Math.max( MENU_BAR_MIN_HEIGHT, SIMULATION_DISPLAY_PIXELS ) );
 
-		timer = new Timer( DEFAULT_SIMULATION_CLOCK_SPEED_MS, this );
+		timer = new Timer( DEFAULT_TIMER_DELAY, this );
 
+		isRenderOn = true;
+		
 		EventQueue.invokeLater( () ->
 		{
 			final int width = SIMULATION_DISPLAY_PIXELS + MENU_BAR_WIDTH;
@@ -99,35 +101,63 @@ public class WalkMain implements ActionListener
 			}
 		} );
 
-		menuBar.registerToggleButton( "Collisions", new ItemListener()
+		menuBar.registerToggleButton( "Collisions", simulator.getIsCollisionOn(), new ActionListener()
 		{
-			@Override
-			public void itemStateChanged( ItemEvent e )
-			{
-				if ( e.getStateChange() == ItemEvent.SELECTED )
-				{
-					simulator.turnCollisionOn();
 
-					// This is to prevent a state where `turnCollisionOn` fails,
-					// but the button is still toggled
-					if ( !simulator.getIsCollisionOn() )
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+				if ( toggleButton.isSelected() )
+				{
+					simulator.tryTurnCollisionOn();
+
+					if ( simulator.getIsCollisionOn() == false )
 					{
-						JToggleButton source = (JToggleButton) e.getSource();
-						source.setSelected( false );
+						toggleButton.setSelected( false );
+					}
+					else
+					{
+
+						display.paintIfTrue( isRenderOn );
+						
 					}
 
 					menuBar.updateStatsDisplays();
 					menuBar.repaint();
-					display.repaint();
 				}
 				else
 				{
 					simulator.turnCollisionOff();
 					menuBar.updateStatsDisplays();
 					menuBar.repaint();
-					display.repaint();
-				}
+					display.paintIfTrue( isRenderOn );
 
+				}
+			}
+		} );
+
+		menuBar.registerToggleButton( "Render", isRenderOn, new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				JToggleButton button = (JToggleButton) e.getSource();
+
+				if ( button.isSelected() )
+				{
+					isRenderOn = true;
+
+					menuBar.updateStatsDisplays();
+					menuBar.repaint();
+					display.paintIfTrue( isRenderOn );
+				}
+				else
+				{
+					isRenderOn = false;
+				}
 			}
 		} );
 
@@ -147,7 +177,7 @@ public class WalkMain implements ActionListener
 
 						source.setTextFieldValue( Integer.toString( scale ) );
 
-						display.repaint();
+						display.paintIfTrue( isRenderOn );
 						menuBar.repaint();
 					}
 				} );
@@ -168,7 +198,7 @@ public class WalkMain implements ActionListener
 						source.setTextFieldValue( Integer.toString( timerDelayMs ) );
 
 						menuBar.updateStatsDisplays();
-						display.repaint();
+						display.paintIfTrue( isRenderOn );
 						menuBar.repaint();
 					}
 				} );
@@ -188,7 +218,7 @@ public class WalkMain implements ActionListener
 						simulator.setWalkerCount( numWalkers );
 
 						menuBar.updateStatsDisplays();
-						display.repaint();
+						display.paintIfTrue( isRenderOn );
 						menuBar.repaint();
 					}
 				} );
@@ -223,7 +253,7 @@ public class WalkMain implements ActionListener
 
 		simulator.resetSimulationState();
 
-		display.repaint();
+		display.paintIfTrue( isRenderOn );
 		menuBar.repaint();
 
 	}
@@ -247,24 +277,30 @@ public class WalkMain implements ActionListener
 		}
 
 		menuBar.updateStatsDisplays();
-		display.repaint();
+		display.paintIfTrue( isRenderOn );
 		menuBar.repaint();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 * 
+	 * This timer calls this method every tick
+	 */
 	@Override
-	// For Timer
 	public void actionPerformed( ActionEvent e )
 	{
 		simulator.step();
 
 		menuBar.updateStatsDisplays();
 
-		display.repaint();
+		display.paintIfTrue( isRenderOn );
 
 		menuBar.repaint();
 	}
 
-	////// UI Getters
 	public int getTimerDelayMs()
 	{
 		return timer.getDelay();
@@ -273,9 +309,6 @@ public class WalkMain implements ActionListener
 	public static void main( String[] args )
 	{
 		WalkMain mainLoop = new WalkMain();
-		// mainLoop.startSimulation();
-
-		// mainLoop.runSimulationForIterations(10000);
 	}
 
 }

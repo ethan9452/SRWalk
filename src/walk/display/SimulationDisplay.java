@@ -39,6 +39,14 @@ public class SimulationDisplay extends JPanel
 	{
 		this.displayPixelScale = displayPixelScale;
 	}
+	
+	public void paintIfTrue( boolean shouldPaint )
+	{
+		if ( shouldPaint )
+		{
+			repaint();
+		}
+	}
 
 	@Override
 	public void paintComponent( Graphics graphics )
