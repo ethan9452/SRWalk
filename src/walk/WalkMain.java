@@ -63,8 +63,9 @@ public class WalkMain implements ActionListener
 			registerMenuButtons();
 			menuBar.addStatsDisplays();
 			menuBar.finishDisplaySetting();
-			// menuBar.validate();
-			// ex.validate();
+			
+			menuBar.updateStatsDisplays();
+			menuBar.repaint();
 		} );
 
 	}
@@ -101,7 +102,7 @@ public class WalkMain implements ActionListener
 			}
 		} );
 
-		menuBar.registerToggleButton( "Collisions", simulator.getIsCollisionOn(), new ActionListener()
+		menuBar.registerToggleButton( "\"Collisions\"", simulator.getIsCollisionOn(), new ActionListener()
 		{
 
 			@Override

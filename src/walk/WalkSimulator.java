@@ -86,26 +86,27 @@ public class WalkSimulator
 	{
 		if ( isCollisionsOn )
 		{
-			// TODO this is shit, ideally have a object with "getNextSpiralCoord" 
+			// TODO this is shit, ideally have a object with
+			// "getNextSpiralCoord"
 			final int maximumPossiblePointsToTraverse = currentWalkers.size() + currentWalls.size();
-			
-			List<Point> spiralIterationPoints = WalkUtil.getSpiralIterationPointsList( maximumPossiblePointsToTraverse );
-			
+
+			List<Point> spiralIterationPoints = WalkUtil
+					.getSpiralIterationPointsList( maximumPossiblePointsToTraverse );
+
 			int spiralIdx = 0;
 			int walkerIdx = 0;
-			while( walkerIdx < currentWalkers.size() )
+			while ( walkerIdx < currentWalkers.size() )
 			{
 				// Check that it doesn't intersect with a wall
-				if ( !currentWalls.contains( currentWalkers.get( walkerIdx ) ))
+				if ( !currentWalls.contains( currentWalkers.get( walkerIdx ) ) )
 				{
 					Point newLoc = spiralIterationPoints.get( spiralIdx );
 					currentWalkers.get( walkerIdx ).move( newLoc.x, newLoc.y );
 					currentWalkers.get( walkerIdx ).resetPossibleNextMoves();
-					
-					
+
 					walkerIdx++;
 				}
-				
+
 				spiralIdx++;
 			}
 		}
@@ -255,6 +256,7 @@ public class WalkSimulator
 
 	private void makeRandomStep()
 	{
+		
 		updateActualFps();
 
 		if ( isCollisionsOn )
@@ -424,6 +426,24 @@ public class WalkSimulator
 	public List<Point> getCurrentMagnets()
 	{
 		return currentMagnets;
+	}
+
+	public void debugNoCollisionsCheck()
+	{
+		if ( isCollisionsOn )
+		{
+			for ( int i = 0; i < currentWalkers.size(); i++ )
+			{
+				for ( int j = i + 1; j < currentWalkers.size(); j++ )
+				{
+					if ( currentWalkers.get( i ).equals( currentWalkers.get( j ) ) )
+					{
+						System.out.println( "Error: walker collision when isCollisionsOn: " + currentWalkers.get( i )
+								+ currentWalkers.get( j ) );
+					}
+				}
+			}
+		}
 	}
 
 }
