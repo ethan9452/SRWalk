@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import randomprovidor.DecimalThresholdRandomProvidor;
 import randomprovidor.DefaultLibraryRandomChoiceProvidor;
 import randomprovidor.IRandomChoiceProvidor;
+import randomprovidor.ModAlgRandomProvidor;
 import spiraliterationprovodor.PointCallback;
 
 /**
@@ -24,7 +26,9 @@ public class WalkSimulator
 {
 	private IRandomChoiceProvidor	random;
 
-	private List<Point>				currentPoints;
+	private List<Walker>			currentWalkers;
+	private List<Point>				currentMagnets;
+	private List<Point>				currentWalls;
 
 	private int						iterCount								= 0;
 
@@ -34,7 +38,7 @@ public class WalkSimulator
 	// TODO: these variables are all "derived" from the simulation state, and
 	// are for UI purposes only. maybe move out to anohter class
 	private Map<Point, Integer>		pointsVisitedCount;
-	private Map<Point, Double>		heatMapWeights							= new HashMap<>();
+	private Map<Point, Double>		heatMapWeights;
 
 	private int						biggestX;
 	private int						smallestX;
@@ -49,7 +53,12 @@ public class WalkSimulator
 	{
 		random = providor;
 
-		currentPoints = new ArrayList<>();
+		currentWalkers = new ArrayList<>();
+		currentMagnets = new ArrayList<>();
+		currentWalls = new ArrayList<>();
+
+		pointsVisitedCount = new HashMap<>();
+		heatMapWeights = new HashMap<>();
 
 		isCollisionsOn = false;
 		isReset = true;
@@ -60,27 +69,45 @@ public class WalkSimulator
 	public WalkSimulator()
 	{
 		this( new DefaultLibraryRandomChoiceProvidor() );
+		// this( new DecimalThresholdRandomProvidor() );
+		// this( new ModAlgRandomProvidor() );
+	}
+
+	public void clearAllObjects()
+	{
+		currentWalkers.clear();
+		currentMagnets.clear();
+		currentWalls.clear();
+
+		resetSimulationStats();
 	}
 
 	public void resetSimulationState()
 	{
 		if ( isCollisionsOn )
 		{
-			List<Point> spiralIterationPoints = WalkUtil.getSpiralIterationPointsList( currentPoints.size() );
-			for ( int i = 0; i < currentPoints.size(); i++ )
+			List<Point> spiralIterationPoints = WalkUtil.getSpiralIterationPointsList( currentWalkers.size() );
+			for ( int i = 0; i < currentWalkers.size(); i++ )
 			{
 				Point newLoc = spiralIterationPoints.get( i );
-				currentPoints.get( i ).move( newLoc.x, newLoc.y );
+				currentWalkers.get( i ).move( newLoc.x, newLoc.y );
+				currentWalkers.get(i).resetPossibleNextMoves();
 			}
 		}
 		else
 		{
-			for ( Point p : currentPoints )
+			for ( Walker p : currentWalkers )
 			{
 				p.move( 0, 0 );
+				p.resetPossibleNextMoves();
 			}
 		}
 
+		resetSimulationStats();
+	}
+
+	private void resetSimulationStats()
+	{
 		biggestX = 0;
 		biggestY = 0;
 		smallestX = 0;
@@ -91,7 +118,7 @@ public class WalkSimulator
 
 		iterCount = 0;
 
-		pointsVisitedCount = new HashMap<Point, Integer>();
+		pointsVisitedCount.clear();
 
 		isReset = true;
 	}
@@ -113,7 +140,7 @@ public class WalkSimulator
 	{
 		if ( numWalkers >= 0 )
 		{
-			int size = currentPoints.size();
+			int size = currentWalkers.size();
 			if ( size > numWalkers )
 			{
 				for ( int i = 0; i < size - numWalkers; i++ )
@@ -138,7 +165,7 @@ public class WalkSimulator
 			if ( isReset )
 			{
 				// TODO this seems like it can be optimized
-				currentPoints.add( new Point( 0, 0 ) );
+				currentWalkers.add( new Walker( 0, 0 ) );
 				resetSimulationState();
 			}
 			else
@@ -148,17 +175,26 @@ public class WalkSimulator
 		}
 		else
 		{
-			currentPoints.add( new Point( 0, 0 ) );
+			currentWalkers.add( new Walker( 0, 0 ) );
 		}
-
 	}
 
 	public void removeWalker()
 	{
-		if ( !currentPoints.isEmpty() )
+		if ( !currentWalkers.isEmpty() )
 		{
-			currentPoints.remove( currentPoints.size() - 1 );
+			currentWalkers.remove( currentWalkers.size() - 1 );
 		}
+	}
+
+	public void addWall( int x, int y )
+	{
+		currentWalls.add( new Point( x, y ) );
+	}
+
+	public void clearWalls()
+	{
+		currentWalls.clear();
 	}
 
 	// TODO could move this to another function, since this is not strictly
@@ -208,99 +244,43 @@ public class WalkSimulator
 
 		if ( isCollisionsOn )
 		{
-			// TODO can def optimize, and clean
-			Point[] possibleMoveVectors = { new Point( 0, 1 ),
-					new Point( 1, 0 ),
-					new Point( 0, -1 ),
-					new Point( -1, 0 ) };
-
-			// TODO this is order dependedt. cannot resort currentPoints
-			List<Set<Point>> blockedMovesForPoints = new ArrayList<>();
-
-			for ( Point currentPoint : currentPoints )
+			//
+			// set walkers' possible moves such that they cannot move into a
+			// space currently occipied by a walker
+			//
+			for ( Walker curWalker : currentWalkers )
 			{
-				Set<Point> blockedMovesForPoint = new HashSet<>();
-
-				for ( Point otherPoint : currentPoints )
+				for ( Walker otherWalker : currentWalkers )
 				{
-
-					for ( Point moveVector : possibleMoveVectors )
+					for ( Point move : Walker.ALL_POSSIBLE_MOVE_VECTORS )
 					{
-						if ( currentPoint.x + moveVector.x == otherPoint.x &&
-								currentPoint.y + moveVector.y == otherPoint.y )
-						{
-							blockedMovesForPoint.add( moveVector );
-						}
+						Point possibleMoveLocation = curWalker.getPotentialMoveLocation( move );
 
+						if ( otherWalker.equals( possibleMoveLocation ) )
+						{
+							curWalker.removePossibleMove( move );
+						}
 					}
 				}
-
-				blockedMovesForPoints.add( blockedMovesForPoint );
 			}
 
-			for ( int i = 0; i < currentPoints.size(); i++ )
-			{
-				Set<Point> blockedMoves = blockedMovesForPoints.get( i );
-				List<Point> possibleMoves = new ArrayList<>( Arrays.asList( possibleMoveVectors ) );
-				possibleMoves.removeAll( blockedMoves );
-
-				if ( !possibleMoves.isEmpty() )
-				{
-					final int choice = random.randomChoice( possibleMoves.size() );
-
-					int x = currentPoints.get( i ).x;
-					int y = currentPoints.get( i ).y;
-
-					Point chosenMove = possibleMoves.get( choice );
-
-					x += chosenMove.x;
-					y += chosenMove.y;
-
-					currentPoints.get( i ).move( x, y );
-
-					biggestX = Math.max( x, biggestX );
-					biggestY = Math.max( y, biggestY );
-					smallestX = Math.min( x, smallestX );
-					smallestY = Math.min( y, smallestY );
-
-					// jesus christtt
-				}
-			}
 		}
-		else
+
+		//
+		// make the move, based off possible moves
+		//
+		for ( Walker walker : currentWalkers )
 		{
-			for ( Point currentPoint : currentPoints )
-			{
-				int x = currentPoint.x;
-				int y = currentPoint.y;
-
-				final int choice = random.randomChoice( 4 );
-
-				if ( choice == 0 )
-				{
-					x++;
-				}
-				else if ( choice == 1 )
-				{
-					x--;
-				}
-				else if ( choice == 2 )
-				{
-					y++;
-				}
-				else if ( choice == 3 )
-				{
-					y--;
-				}
-
-				currentPoint.move( x, y );
-
-				biggestX = Math.max( x, biggestX );
-				biggestY = Math.max( y, biggestY );
-				smallestX = Math.min( x, smallestX );
-				smallestY = Math.min( y, smallestY );
-			}
+			walker.moveRandomlyBasedOnPossibleMoves( random );
+			
+			biggestX = Math.max( walker.x, biggestX );
+			biggestY = Math.max( walker.y, biggestY );
+			smallestX = Math.min( walker.x, smallestX );
+			smallestY = Math.min( walker.y, smallestY );
 		}
+		
+		
+
 
 	}
 
@@ -326,7 +306,7 @@ public class WalkSimulator
 
 	private void recordCurrentPoint()
 	{
-		for ( Point currentPoint : currentPoints )
+		for ( Point currentPoint : currentWalkers )
 		{
 			if ( pointsVisitedCount.containsKey( currentPoint ) )
 			{
@@ -373,7 +353,7 @@ public class WalkSimulator
 
 	public int getNumWalkers()
 	{
-		return currentPoints.size();
+		return currentWalkers.size();
 	}
 
 	public int getBiggestX()
@@ -401,9 +381,19 @@ public class WalkSimulator
 		return actualFps;
 	}
 
-	public List<Point> getCurrentPoints()
+	public List<? extends Point> getCurrentPoints()
 	{
-		return currentPoints;
+		return currentWalkers;
+	}
+
+	public List<Point> getCurrentWalls()
+	{
+		return currentWalls;
+	}
+
+	public List<Point> getCurrentMagnets()
+	{
+		return currentMagnets;
 	}
 
 }

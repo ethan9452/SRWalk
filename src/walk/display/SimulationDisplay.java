@@ -55,14 +55,24 @@ public class SimulationDisplay extends JPanel
 
 		paintHeatMap( graphics );
 
-		List<Point> points = simulator.getCurrentPoints();
-		for ( Point p : points )
+		for ( Point p : simulator.getCurrentPoints() )
 		{
 			final int logicalX = p.x;
 			final int logicalY = p.y;
 
-			paintWalker( logicalX, logicalY, graphics, Color.black );
+			paintPoint( logicalX, logicalY, graphics, Color.black );
 		}
+		
+		for ( Point p: simulator.getCurrentWalls() )
+		{
+			final int logicalX = p.x;
+			final int logicalY = p.y;
+
+			paintPoint( logicalX, logicalY, graphics, Color.gray );			
+		}
+		
+		// TODO add paint code for walls and magnets
+		
 
 	}
 
@@ -81,7 +91,7 @@ public class SimulationDisplay extends JPanel
 		return new Point( paintX, paintY );
 	}
 
-	private void paintWalker( int logicalX, int logicalY, Graphics graphics, Color color )
+	private void paintPoint( int logicalX, int logicalY, Graphics graphics, Color color )
 	{
 		Point center = logicalToDisplay( logicalX, logicalY );
 
@@ -106,7 +116,7 @@ public class SimulationDisplay extends JPanel
 			final int logicalX = visitedPoint.getKey().x;
 			final int logicalY = visitedPoint.getKey().y;
 
-			paintWalker( logicalX, logicalY, graphics, redShadeColor );
+			paintPoint( logicalX, logicalY, graphics, redShadeColor );
 		}
 	}
 }
