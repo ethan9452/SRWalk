@@ -1,8 +1,12 @@
 package walk.display;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +20,7 @@ import org.ietf.jgss.Oid;
 import walk.WalkMain;
 import walk.WalkSimulator;
 
-public class SimulationDisplay extends JPanel
+public class SimulationDisplay extends JPanel 
 {
 	WalkSimulator	simulator;
 
@@ -31,15 +35,16 @@ public class SimulationDisplay extends JPanel
 		this.displayLengthPixels = displayLengthPixels;
 		this.displayPixelScale = displayPixelScale;
 
-
 		// setBackground( Color.LIGHT_GRAY );
+		
+		
 	}
 
 	public void setDisplayPixelScale( int displayPixelScale )
 	{
 		this.displayPixelScale = displayPixelScale;
 	}
-	
+
 	public void paintIfTrue( boolean shouldPaint )
 	{
 		if ( shouldPaint )
@@ -62,17 +67,16 @@ public class SimulationDisplay extends JPanel
 
 			paintPoint( logicalX, logicalY, graphics, Color.black );
 		}
-		
-		for ( Point p: simulator.getCurrentWalls() )
+
+		for ( Point p : simulator.getCurrentWalls() )
 		{
 			final int logicalX = p.x;
 			final int logicalY = p.y;
 
-			paintPoint( logicalX, logicalY, graphics, Color.gray );			
+			paintPoint( logicalX, logicalY, graphics, Color.gray );
 		}
-		
+
 		// TODO add paint code for walls and magnets
-		
 
 	}
 
@@ -89,6 +93,16 @@ public class SimulationDisplay extends JPanel
 		final int paintY = (displayLengthPixels / 2) - (logicalY * displayPixelScale);
 
 		return new Point( paintX, paintY );
+	}
+
+	public Point displayToLogical( int paintX, int paintY )
+	{
+		// hopefully this doesnt shit the bed
+		final int scale = displayLengthPixels / (2 * displayPixelScale);
+		final int logicalX = (paintX / displayPixelScale) - scale;
+		final int logicalY = (-paintY / displayPixelScale) + scale;
+
+		return new Point( logicalX, logicalY );
 	}
 
 	private void paintPoint( int logicalX, int logicalY, Graphics graphics, Color color )
@@ -119,4 +133,5 @@ public class SimulationDisplay extends JPanel
 			paintPoint( logicalX, logicalY, graphics, redShadeColor );
 		}
 	}
+
 }

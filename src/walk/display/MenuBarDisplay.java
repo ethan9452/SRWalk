@@ -28,11 +28,12 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 
+import walk.SimulationObjectType;
 import walk.WalkMain;
 import walk.WalkSimulator;
 
 public class MenuBarDisplay extends JPanel
-{
+{	
 	private static Font				DEFAULT_Font		= new JLabel().getFont();
 	private static Font				SMALLER_FONT		= new Font( DEFAULT_Font.getName(), DEFAULT_Font.getStyle(),
 			(DEFAULT_Font.getSize() - 2) );
@@ -58,6 +59,8 @@ public class MenuBarDisplay extends JPanel
 
 	private JLabel					intendedFps;
 	private JLabel					actualFps;
+	
+	private SimulationObjectType paintBrushObjectType;
 
 	public MenuBarDisplay( WalkMain simulatorMain, WalkSimulator simulator, int widthPixels, int heightPixels )
 	{
@@ -80,6 +83,8 @@ public class MenuBarDisplay extends JPanel
 
 		intendedFps = new JLabel( "Set FPS:" );
 		actualFps = new JLabel( "Actual FPS:" );
+		
+		paintBrushObjectType = SimulationObjectType.NONE;
 	}
 
 	public void finishDisplaySetting()
@@ -237,4 +242,14 @@ public class MenuBarDisplay extends JPanel
 				component.getPreferredSize() + " min size " + component.getMinimumSize() + " max size " + component.getMaximumSize() );
 	}
 
+	
+	public SimulationObjectType getPaintBrushObjectType()
+	{
+		return paintBrushObjectType;
+	}
+
+	public void setPaintBrushObjectType( SimulationObjectType paintBrushObjectType )
+	{
+		this.paintBrushObjectType = paintBrushObjectType;
+	}
 }

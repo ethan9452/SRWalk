@@ -256,6 +256,7 @@ public class WalkSimulator
 
 	private void makeRandomStep()
 	{
+		debugNoCollisionsCheck(); // TODO remove if not debugging
 		
 		updateActualFps();
 
@@ -430,17 +431,29 @@ public class WalkSimulator
 
 	public void debugNoCollisionsCheck()
 	{
-		if ( isCollisionsOn )
+//		if ( isCollisionsOn )
+//		{
+//			for ( int i = 0; i < currentWalkers.size(); i++ )
+//			{
+//				for ( int j = i + 1; j < currentWalkers.size(); j++ )
+//				{
+//					if ( currentWalkers.get( i ).equals( currentWalkers.get( j ) ) )
+//					{
+//						System.out.println( "Error: walker collision when isCollisionsOn: " + currentWalkers.get( i )
+//								+ currentWalkers.get( j ) );
+//					}
+//				}
+//			}
+//		}
+		
+		for ( int i = 0; i < currentWalkers.size(); i++ )
 		{
-			for ( int i = 0; i < currentWalkers.size(); i++ )
+			for ( int j = i + 1; j < currentWalls.size(); j++ )
 			{
-				for ( int j = i + 1; j < currentWalkers.size(); j++ )
+				if ( currentWalkers.get( i ).equals( currentWalls.get( j ) ) )
 				{
-					if ( currentWalkers.get( i ).equals( currentWalkers.get( j ) ) )
-					{
-						System.out.println( "Error: walker collision when isCollisionsOn: " + currentWalkers.get( i )
-								+ currentWalkers.get( j ) );
-					}
+					System.out.println( "Error: walker collision with wall: " + currentWalkers.get( i )
+							+ currentWalls.get( j ) );
 				}
 			}
 		}

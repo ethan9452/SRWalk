@@ -1,10 +1,14 @@
 package walk;
 
 import java.awt.EventQueue;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerModel;
@@ -66,8 +70,11 @@ public class WalkMain implements ActionListener
 			
 			menuBar.updateStatsDisplays();
 			menuBar.repaint();
+			
+			registerDisplayMouseListeners();
 		} );
 
+		
 	}
 
 	private void registerMenuButtons()
@@ -246,6 +253,73 @@ public class WalkMain implements ActionListener
 
 					}
 				} );
+	}
+	
+	private void registerDisplayMouseListeners()
+	{
+		display.addMouseMotionListener( new MouseMotionListener()
+		{
+			
+			@Override
+			public void mouseMoved( MouseEvent e )
+			{
+				// Nothing
+				
+			}
+			
+			@Override
+			public void mouseDragged( MouseEvent e )
+			{
+				final int paintX = e.getPoint().x;
+				final int paintY = e.getPoint().y;
+				
+				final Point newWall = display.displayToLogical( paintX, paintY );
+				simulator.addWall( newWall.x, newWall.y );
+				
+				display.repaint();
+				
+				System.out.println("dragged!");
+			}
+		} );
+		
+		display.addMouseListener( new MouseListener()
+		{
+			
+			@Override
+			public void mouseReleased( MouseEvent e )
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed( MouseEvent e )
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited( MouseEvent e )
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered( MouseEvent e )
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked( MouseEvent e )
+			{
+				// TODO Auto-generated method stub
+				
+			}
+		} );
 	}
 
 	private void resetSimulation()
