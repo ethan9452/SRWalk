@@ -9,6 +9,9 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.Spliterator;
 
+/* Note: it might be faster to have a set as well, for the contains call (probably not since i'm only using this with 4 elements)
+ * 
+ * */
 public class ArrayListSet<E> extends ArrayList<E> implements Set<E>, List<E>
 {
 	public ArrayListSet( List<E> stuff )

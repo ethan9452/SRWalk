@@ -86,12 +86,27 @@ public class WalkSimulator
 	{
 		if ( isCollisionsOn )
 		{
-			List<Point> spiralIterationPoints = WalkUtil.getSpiralIterationPointsList( currentWalkers.size() );
-			for ( int i = 0; i < currentWalkers.size(); i++ )
+			// TODO this is shit, ideally have a object with "getNextSpiralCoord" 
+			final int maximumPossiblePointsToTraverse = currentWalkers.size() + currentWalls.size();
+			
+			List<Point> spiralIterationPoints = WalkUtil.getSpiralIterationPointsList( maximumPossiblePointsToTraverse );
+			
+			int spiralIdx = 0;
+			int walkerIdx = 0;
+			while( walkerIdx < currentWalkers.size() )
 			{
-				Point newLoc = spiralIterationPoints.get( i );
-				currentWalkers.get( i ).move( newLoc.x, newLoc.y );
-				currentWalkers.get(i).resetPossibleNextMoves();
+				// Check that it doesn't intersect with a wall
+				if ( !currentWalls.contains( currentWalkers.get( walkerIdx ) ))
+				{
+					Point newLoc = spiralIterationPoints.get( spiralIdx );
+					currentWalkers.get( walkerIdx ).move( newLoc.x, newLoc.y );
+					currentWalkers.get( walkerIdx ).resetPossibleNextMoves();
+					
+					
+					walkerIdx++;
+				}
+				
+				spiralIdx++;
 			}
 		}
 		else
@@ -263,7 +278,25 @@ public class WalkSimulator
 					}
 				}
 			}
+		}
 
+		//
+		// factor in Walls
+		//
+		for ( Walker curWalker : currentWalkers )
+		{
+			for ( Point wall : currentWalls )
+			{
+				for ( Point move : Walker.ALL_POSSIBLE_MOVE_VECTORS )
+				{
+					Point possibleMoveLocation = curWalker.getPotentialMoveLocation( move );
+
+					if ( wall.equals( possibleMoveLocation ) )
+					{
+						curWalker.removePossibleMove( move );
+					}
+				}
+			}
 		}
 
 		//
@@ -272,15 +305,12 @@ public class WalkSimulator
 		for ( Walker walker : currentWalkers )
 		{
 			walker.moveRandomlyBasedOnPossibleMoves( random );
-			
+
 			biggestX = Math.max( walker.x, biggestX );
 			biggestY = Math.max( walker.y, biggestY );
 			smallestX = Math.min( walker.x, smallestX );
 			smallestY = Math.min( walker.y, smallestY );
 		}
-		
-		
-
 
 	}
 
