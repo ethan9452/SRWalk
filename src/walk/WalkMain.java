@@ -111,7 +111,17 @@ public class WalkMain implements ActionListener
 
 		menuBar.registerToggleButton( "\"Collisions\"", simulator.getIsCollisionOn(), new ActionListener()
 		{
-
+/*
+ * TODO
+ * 
+ * 1. implement menu button paintbrush chooser
+ * 
+ * 2. paint the right object
+ * 
+ * 3. don't paint walls over walker if collision. 
+ * 
+ * 
+ * */
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
