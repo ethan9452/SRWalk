@@ -20,14 +20,14 @@ Simulation of different objects in a X-Y plane
 ## Object Interactions 
 Should be fair (point's order in list shouldn't affect outcome)
 
-| Walker                      | Wall                      | Magnet                      |
-|-----------------------------|---------------------------|---------------------------  |
-| asdfasdf        | asdf | asdf|
+|                              | Walker                      | Wall                      | Magnet                      |
+|-----------------------------|-----------------------------|---------------------------|---------------------------  |
+|     Walker                         |                       |                       |                       |
+|   Wall                           |   xxx                    |                       |                       |
+|    Magnet                          |    xxx                   |    xxx                   |                       |
 
 
-| Command | Description |
-| git status | List all new or modified files |
-| git diff | Show file differences that haven't been staged |
+
 
 1. On simulation step: if 2 adjacent points, BOTH points cannot move to the direction with an adjacent point
 
