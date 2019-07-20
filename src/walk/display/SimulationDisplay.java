@@ -17,10 +17,11 @@ import javax.swing.JPanel;
 
 import org.ietf.jgss.Oid;
 
+import walk.Magnet;
 import walk.WalkMain;
 import walk.WalkSimulator;
 
-public class SimulationDisplay extends JPanel 
+public class SimulationDisplay extends JPanel
 {
 	WalkSimulator	simulator;
 
@@ -36,8 +37,7 @@ public class SimulationDisplay extends JPanel
 		this.displayPixelScale = displayPixelScale;
 
 		// setBackground( Color.LIGHT_GRAY );
-		
-		
+
 	}
 
 	public void setDisplayPixelScale( int displayPixelScale )
@@ -60,6 +60,21 @@ public class SimulationDisplay extends JPanel
 
 		paintHeatMap( graphics );
 
+		for ( Magnet m : simulator.getCurrentMagnets() )
+		{
+			final int logicalX = m.x;
+			final int logicalY = m.y;
+
+			if ( m.getIsAttractive() )
+			{
+				paintPoint( logicalX, logicalY, graphics, Color.blue );
+			}
+			else
+			{
+				paintPoint( logicalX, logicalY, graphics, Color.red );
+			}
+		}
+
 		for ( Point p : simulator.getCurrentPoints() )
 		{
 			final int logicalX = p.x;
@@ -75,8 +90,6 @@ public class SimulationDisplay extends JPanel
 
 			paintPoint( logicalX, logicalY, graphics, Color.gray );
 		}
-
-		// TODO add paint code for walls and magnets
 
 	}
 
@@ -125,12 +138,12 @@ public class SimulationDisplay extends JPanel
 		{
 			final int rDarknessMultiplier = (int) (visitedPoint.getValue() * 255.0);
 
-			Color redShadeColor = new Color( 255, 255 - rDarknessMultiplier, 255 - rDarknessMultiplier );
+			Color heatMapTrailColor = new Color( 255, 255, 255 - rDarknessMultiplier );
 
 			final int logicalX = visitedPoint.getKey().x;
 			final int logicalY = visitedPoint.getKey().y;
 
-			paintPoint( logicalX, logicalY, graphics, redShadeColor );
+			paintPoint( logicalX, logicalY, graphics, heatMapTrailColor );
 		}
 	}
 

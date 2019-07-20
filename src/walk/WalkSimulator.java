@@ -21,7 +21,7 @@ public class WalkSimulator
 	private IRandomChoiceProvidor	random;
 
 	private List<Walker>			currentWalkers;
-	private List<Point>				currentMagnets;
+	private List<Magnet>			currentMagnets;
 	private List<Point>				currentWalls;
 
 	private int						iterCount;
@@ -200,36 +200,35 @@ public class WalkSimulator
 	public void tryAddWalker( int x, int y )
 	{
 		Walker potentialNew = new Walker( x, y );
-		
+
 		if ( isCollisionsOn )
 		{
-			if ( currentWalkers.contains( potentialNew ))
+			if ( currentWalkers.contains( potentialNew ) )
 			{
 				return;
-			}	
+			}
 		}
-		
+
 		if ( currentWalls.contains( potentialNew ) )
 		{
 			return;
 		}
-		
+
 		currentWalkers.add( potentialNew );
 	}
-	
+
 	public void tryAddWall( int x, int y )
 	{
 		throw new RuntimeException( "implement collision check" );
 
-//		currentWalls.add( new Point( x, y ) );
+		// currentWalls.add( new Point( x, y ) );
 	}
-	
-	
+
 	public void tryAddMagnet( int x, int y )
 	{
 		throw new RuntimeException( "implement collision check" );
 
-//		currentWalls.add( new Point( x, y ) );
+		// currentWalls.add( new Point( x, y ) );
 	}
 
 	public void clearWalls()
@@ -448,7 +447,7 @@ public class WalkSimulator
 		return currentWalls;
 	}
 
-	public List<Point> getCurrentMagnets()
+	public List<Magnet> getCurrentMagnets()
 	{
 		return currentMagnets;
 	}
