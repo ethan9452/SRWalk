@@ -26,7 +26,6 @@ Should be fair (point's order in list shouldn't affect outcome)
 
 
 | Command | Description |
-| --- | --- |
 | git status | List all new or modified files |
 | git diff | Show file differences that haven't been staged |
 
