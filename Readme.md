@@ -22,13 +22,8 @@ Should be fair (point's order in list shouldn't affect outcome)
 
 |                              | Walker                      | Wall                      | Magnet                      |
 |-----------------------------|-----------------------------|---------------------------|---------------------------  |
-|     Walker                         |                       |                       |                       |
-|   Wall                           |   xxx                    |                       |                       |
-|    Magnet                          |    xxx                   |    xxx                   |                       |
+|     Walker                         | If collisions on, cannot move to a spot where another walker currently is | Can never intersect  | Magnet attracts or repels walkers |
+|   Wall                           |   xxx                    |  Nothing                     | Nothing                      |
+|    Magnet                          |    xxx                   |    xxx                   |     Nothing                  |
 
 
-
-
-1. On simulation step: if 2 adjacent points, BOTH points cannot move to the direction with an adjacent point
-
-## 
