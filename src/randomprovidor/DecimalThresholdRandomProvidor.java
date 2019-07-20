@@ -17,7 +17,7 @@ public class DecimalThresholdRandomProvidor extends IRandomChoiceProvidor
 	}
 
 	@Override
-	public int randomChoice( int numChoices )
+	public int randomUniformChoice( int numChoices )
 	{
 		if ( numChoices > 1 )
 		{

@@ -267,13 +267,15 @@ public class WalkMain implements ActionListener
 	
 	private void registerDisplayMouseListeners()
 	{
+		
 		display.addMouseMotionListener( new MouseMotionListener()
 		{
 			
 			@Override
 			public void mouseMoved( MouseEvent e )
 			{
-				// Nothing
+				// 
+			
 				
 			}
 			
@@ -284,13 +286,15 @@ public class WalkMain implements ActionListener
 				final int paintY = e.getPoint().y;
 				
 				final Point newWall = display.displayToLogical( paintX, paintY );
-				simulator.addWall( newWall.x, newWall.y );
+				simulator.tryAddWall( newWall.x, newWall.y );
 				
 				display.repaint();
 				
 				System.out.println("dragged!");
 			}
 		} );
+		
+		
 		
 		display.addMouseListener( new MouseListener()
 		{

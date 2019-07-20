@@ -58,7 +58,7 @@ public class Walker extends Point
 	{
 		if ( !possibleNextMoves.isEmpty() )
 		{
-			final int choiceIdx = random.randomChoice( possibleNextMoves.size() );
+			final int choiceIdx = random.randomUniformChoice( possibleNextMoves.size() );
 			Point chosenMove = possibleNextMoves.get( choiceIdx );
 
 			translate( chosenMove.x, chosenMove.y );

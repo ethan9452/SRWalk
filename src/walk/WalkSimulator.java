@@ -2,19 +2,13 @@ package walk;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import randomprovidor.DecimalThresholdRandomProvidor;
 import randomprovidor.DefaultLibraryRandomChoiceProvidor;
 import randomprovidor.IRandomChoiceProvidor;
-import randomprovidor.ModAlgRandomProvidor;
-import spiraliterationprovodor.PointCallback;
 
 /**
  * Simulates a point moving randomly in a X-Y cartiensn plane.
@@ -30,7 +24,7 @@ public class WalkSimulator
 	private List<Point>				currentMagnets;
 	private List<Point>				currentWalls;
 
-	private int						iterCount								= 0;
+	private int						iterCount;
 
 	private boolean					isCollisionsOn;
 	private boolean					isReset;
@@ -62,6 +56,7 @@ public class WalkSimulator
 
 		isCollisionsOn = false;
 		isReset = true;
+		iterCount = 0;
 
 		resetSimulationState();
 	}
@@ -97,8 +92,7 @@ public class WalkSimulator
 			int walkerIdx = 0;
 			while ( walkerIdx < currentWalkers.size() )
 			{
-				// Check that it doesn't intersect with a wall
-				if ( !currentWalls.contains( currentWalkers.get( walkerIdx ) ) )
+				if ( !currentWalls.contains( spiralIterationPoints.get( spiralIdx ) ) )
 				{
 					Point newLoc = spiralIterationPoints.get( spiralIdx );
 					currentWalkers.get( walkerIdx ).move( newLoc.x, newLoc.y );
@@ -203,9 +197,39 @@ public class WalkSimulator
 		}
 	}
 
-	public void addWall( int x, int y )
+	public void tryAddWalker( int x, int y )
 	{
-		currentWalls.add( new Point( x, y ) );
+		Walker potentialNew = new Walker( x, y );
+		
+		if ( isCollisionsOn )
+		{
+			if ( currentWalkers.contains( potentialNew ))
+			{
+				return;
+			}	
+		}
+		
+		if ( currentWalls.contains( potentialNew ) )
+		{
+			return;
+		}
+		
+		currentWalkers.add( potentialNew );
+	}
+	
+	public void tryAddWall( int x, int y )
+	{
+		throw new RuntimeException( "implement collision check" );
+
+//		currentWalls.add( new Point( x, y ) );
+	}
+	
+	
+	public void tryAddMagnet( int x, int y )
+	{
+		throw new RuntimeException( "implement collision check" );
+
+//		currentWalls.add( new Point( x, y ) );
 	}
 
 	public void clearWalls()
@@ -257,7 +281,7 @@ public class WalkSimulator
 	private void makeRandomStep()
 	{
 		debugNoCollisionsCheck(); // TODO remove if not debugging
-		
+
 		updateActualFps();
 
 		if ( isCollisionsOn )
@@ -431,21 +455,22 @@ public class WalkSimulator
 
 	public void debugNoCollisionsCheck()
 	{
-//		if ( isCollisionsOn )
-//		{
-//			for ( int i = 0; i < currentWalkers.size(); i++ )
-//			{
-//				for ( int j = i + 1; j < currentWalkers.size(); j++ )
-//				{
-//					if ( currentWalkers.get( i ).equals( currentWalkers.get( j ) ) )
-//					{
-//						System.out.println( "Error: walker collision when isCollisionsOn: " + currentWalkers.get( i )
-//								+ currentWalkers.get( j ) );
-//					}
-//				}
-//			}
-//		}
-		
+		// if ( isCollisionsOn )
+		// {
+		// for ( int i = 0; i < currentWalkers.size(); i++ )
+		// {
+		// for ( int j = i + 1; j < currentWalkers.size(); j++ )
+		// {
+		// if ( currentWalkers.get( i ).equals( currentWalkers.get( j ) ) )
+		// {
+		// System.out.println( "Error: walker collision when isCollisionsOn: " +
+		// currentWalkers.get( i )
+		// + currentWalkers.get( j ) );
+		// }
+		// }
+		// }
+		// }
+
 		for ( int i = 0; i < currentWalkers.size(); i++ )
 		{
 			for ( int j = i + 1; j < currentWalls.size(); j++ )

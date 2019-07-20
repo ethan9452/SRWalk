@@ -50,7 +50,7 @@ public class RandomProvidersDistributionTests
 
 		for ( int i = 0; i < NUM_TEST_ITERATIONS; i++ )
 		{
-			final int choice = providor.randomChoice( numChoices );
+			final int choice = providor.randomUniformChoice( numChoices );
 			choices[choice]++;
 		}
 

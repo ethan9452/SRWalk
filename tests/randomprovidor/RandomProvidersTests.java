@@ -38,7 +38,7 @@ class RandomProvidersTests
 		{
 			for ( int range = 0; range < rangeToTest; range++ )
 			{
-				final int choice = provider.randomChoice( range );
+				final int choice = provider.randomUniformChoice( range );
 				assertTrue( choice >= 0 );
 
 				if ( range > 0 )

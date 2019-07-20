@@ -248,8 +248,8 @@ public class MenuBarDisplay extends JPanel
 		return paintBrushObjectType;
 	}
 
-	public void setPaintBrushObjectType( SimulationObjectType paintBrushObjectType )
-	{
-		this.paintBrushObjectType = paintBrushObjectType;
-	}
+//	public void setPaintBrushObjectType( SimulationObjectType paintBrushObjectType )
+//	{
+//		this.paintBrushObjectType = paintBrushObjectType;
+//	}
 }

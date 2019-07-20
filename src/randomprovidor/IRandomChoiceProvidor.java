@@ -5,7 +5,8 @@ import java.util.List;
 
 public abstract class IRandomChoiceProvidor
 {
-	// TODO: this is kind of lame, is there a way to do this automatically ? Reflection?
+	// TODO: this is kind of lame, is there a way to do this automatically ?
+	// Reflection?
 	public static List<Class<? extends IRandomChoiceProvidor>> IMPLEMENTED_PROVIDORS = new ArrayList<Class<? extends IRandomChoiceProvidor>>()
 	{
 		{
@@ -21,5 +22,5 @@ public abstract class IRandomChoiceProvidor
 	 * @param numChoices
 	 * @return
 	 */
-	public abstract int randomChoice( int numChoices );
+	public abstract int randomUniformChoice( int numChoices );
 }
