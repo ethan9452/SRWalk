@@ -23,7 +23,7 @@ Should be fair (point's order in list shouldn't affect outcome)
 |                              | Walker                      | Wall                      | Magnet                      |
 |-----------------------------|-----------------------------|---------------------------|---------------------------  |
 |     Walker                         | If collisions on, cannot move to a spot where another walker currently is | Can never intersect  | Magnet attracts or repels walkers |
-|   Wall                           |   xxx                    |  Nothing                     | Nothing                      |
+|   Wall                           |   xxx                    |  Shouln't intersect                     | Can intersect                      |
 |    Magnet                          |    xxx                   |    xxx                   |     Nothing                  |
 
 

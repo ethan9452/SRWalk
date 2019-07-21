@@ -219,7 +219,9 @@ public class WalkSimulator
 
 	public void tryAddWall( int x, int y )
 	{
-		throw new RuntimeException( "implement collision check" );
+		Point potentialNew = new Point( x, y );
+		
+		
 
 		// currentWalls.add( new Point( x, y ) );
 	}
@@ -470,6 +472,7 @@ public class WalkSimulator
 		// }
 		// }
 
+		// Walkers cannot intersect wall
 		for ( int i = 0; i < currentWalkers.size(); i++ )
 		{
 			for ( int j = i + 1; j < currentWalls.size(); j++ )
@@ -477,6 +480,19 @@ public class WalkSimulator
 				if ( currentWalkers.get( i ).equals( currentWalls.get( j ) ) )
 				{
 					System.out.println( "Error: walker collision with wall: " + currentWalkers.get( i )
+							+ currentWalls.get( j ) );
+				}
+			}
+		}
+
+		// Wall cannot intersect wall
+		for ( int i = 0; i < currentWalls.size(); i++ )
+		{
+			for ( int j = i + 1; j < currentWalls.size(); j++ )
+			{
+				if ( currentWalls.get( i ).equals( currentWalls.get( j ) ) )
+				{
+					System.out.println( "Error: wall collision with wall: " + currentWalls.get( i )
 							+ currentWalls.get( j ) );
 				}
 			}
