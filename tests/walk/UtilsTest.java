@@ -1,4 +1,4 @@
-package util;
+package walk;
 
 import static org.junit.jupiter.api.Assertions.*;
 

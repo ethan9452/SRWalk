@@ -1,6 +1,7 @@
 package walk;
 
 import java.awt.EventQueue;
+import java.util.List;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,12 +11,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import walk.display.MenuBarSection;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerModel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
+import walk.display.ComboBoxWithSubmitButton;
 import walk.display.DisplayFrame;
 import walk.display.JSliderWithTextField;
 import walk.display.MenuBarDisplay;
@@ -25,26 +33,27 @@ import walk.display.TextFieldWithSubmitButton;
 public class WalkMain implements ActionListener
 {
 	// Simulation Display Settings
-	final static int			SIMULATION_DISPLAY_PIXELS			= 600;
+	final static int						SIMULATION_DISPLAY_PIXELS			= 600;
 
-	final static int			MENU_BAR_WIDTH						= 200;
-	final static int			MENU_BAR_MIN_HEIGHT					= 400;
+	final static int						MENU_BAR_WIDTH						= 400;
+	final static int						MENU_BAR_MIN_HEIGHT					= 400;
 
-	private static final int	MAX_SIMULATION_DISPLAY_SCALE		= 100;
-	private static final int	MIN_SIMULATION_DISPLAY_SCALE		= 1;
-	private final static int	DEFAULT_SIMULATION_DISPLAY_SCALE	= 40;
+	private static final int				MAX_SIMULATION_DISPLAY_SCALE		= 100;
+	private static final int				MIN_SIMULATION_DISPLAY_SCALE		= 1;
+	private final static int				DEFAULT_SIMULATION_DISPLAY_SCALE	= 40;
 
-	private static final int	MAX_TIMER_DELAY						= 1000;
-	private static final int	MIN_TIMER_DELAY						= 1;
-	private static final int	DEFAULT_TIMER_DELAY					= 80;
+	private static final int				MAX_TIMER_DELAY						= 1000;
+	private static final int				MIN_TIMER_DELAY						= 1;
+	private static final int				DEFAULT_TIMER_DELAY					= 80;
 
-	private SimulationDisplay	display;
-	private MenuBarDisplay		menuBar;
-	private WalkSimulator		simulator;
+	private SimulationDisplay				display;
+	private SimulationDisplayMouseListener	mouseListener;
+	private MenuBarDisplay					menuBar;
+	private WalkSimulator					simulator;
 
-	private Timer				timer;
-	
-	private boolean isRenderOn;
+	private Timer							timer;
+
+	private boolean							isRenderOn;
 
 	public WalkMain()
 	{
@@ -52,11 +61,12 @@ public class WalkMain implements ActionListener
 		display = new SimulationDisplay( simulator, SIMULATION_DISPLAY_PIXELS, DEFAULT_SIMULATION_DISPLAY_SCALE );
 		menuBar = new MenuBarDisplay( this, simulator, MENU_BAR_WIDTH,
 				Math.max( MENU_BAR_MIN_HEIGHT, SIMULATION_DISPLAY_PIXELS ) );
+		mouseListener = new SimulationDisplayMouseListener( simulator, display, menuBar );
 
 		timer = new Timer( DEFAULT_TIMER_DELAY, this );
 
 		isRenderOn = true;
-		
+
 		EventQueue.invokeLater( () ->
 		{
 			final int width = SIMULATION_DISPLAY_PIXELS + MENU_BAR_WIDTH;
@@ -66,15 +76,14 @@ public class WalkMain implements ActionListener
 
 			registerMenuButtons();
 			menuBar.addStatsDisplays();
-			menuBar.finishDisplaySetting();
-			
+			menuBar.addSettingsForAllComponentsInHeirarchy();
+
 			menuBar.updateStatsDisplays();
 			menuBar.repaint();
-			
+
 			registerDisplayMouseListeners();
 		} );
 
-		
 	}
 
 	private void registerMenuButtons()
@@ -109,19 +118,20 @@ public class WalkMain implements ActionListener
 			}
 		} );
 
+		menuBar.registerButton( "Clear Objects", new ActionListener()
+		{
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				resetSimulation();
+				simulator.clearAllObjects();
+				menuBar.updateStatsDisplays();
+				menuBar.repaint();
+			}
+		} );
+
 		menuBar.registerToggleButton( "\"Collisions\"", simulator.getIsCollisionOn(), new ActionListener()
 		{
-/*
- * TODO
- * 
- * 1. implement menu button paintbrush chooser
- * 
- * 2. paint the right object
- * 
- * 3. don't paint walls over walker if collision. 
- * 
- * 
- * */
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
@@ -139,7 +149,7 @@ public class WalkMain implements ActionListener
 					{
 
 						display.paintIfTrue( isRenderOn );
-						
+
 					}
 
 					menuBar.updateStatsDisplays();
@@ -241,7 +251,7 @@ public class WalkMain implements ActionListener
 					}
 				} );
 
-		menuBar.registerSubmittableInputField( "Run", "Run Simulation for Iterations: ",
+		menuBar.registerSubmittableInputField( "Run", "Run Simulation for Iterations: ", MenuBarSection.MENU_LEFT,
 				new ActionListener()
 				{
 					@Override
@@ -263,77 +273,73 @@ public class WalkMain implements ActionListener
 
 					}
 				} );
-	}
-	
-	private void registerDisplayMouseListeners()
-	{
-		
-		display.addMouseMotionListener( new MouseMotionListener()
+
+		menuBar.registerSubmittableInputField( "Save", "Save State", MenuBarSection.MENU_RIGHT, new ActionListener()
 		{
-			
 			@Override
-			public void mouseMoved( MouseEvent e )
+			public void actionPerformed( ActionEvent e )
 			{
-				// 
-			
-				
+				TextFieldWithSubmitButton source = (TextFieldWithSubmitButton) e.getSource();
+
+				final String inputValue = source.getInputValue();
+
+				WalkSimulatorStateSaver.saveSimulationState( inputValue, simulator );
 			}
-			
+		} );
+
+		menuBar.registerComboBoxWithSubmitButton( new String[0], "Load", MenuBarSection.MENU_RIGHT, new ActionListener()
+		{
 			@Override
-			public void mouseDragged( MouseEvent e )
+			public void actionPerformed( ActionEvent e )
 			{
-				final int paintX = e.getPoint().x;
-				final int paintY = e.getPoint().y;
+				// TODO getting the ComboBoxWithSubmitButton by reffering to parent seems hacky..
+				JButton source = (JButton) e.getSource();
+				ComboBoxWithSubmitButton parentContainer = (ComboBoxWithSubmitButton)source.getParent();
 				
-				final Point newWall = display.displayToLogical( paintX, paintY );
-				simulator.tryAddWall( newWall.x, newWall.y );
+				WalkSimulatorStateSaver.loadSimulationState( parentContainer.getSelectedFile(), simulator );
 				
 				display.repaint();
-				
-				System.out.println("dragged!");
+				menuBar.repaint();
 			}
-		} );
-		
-		
-		
-		display.addMouseListener( new MouseListener()
-		{
-			
-			@Override
-			public void mouseReleased( MouseEvent e )
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mousePressed( MouseEvent e )
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseExited( MouseEvent e )
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseEntered( MouseEvent e )
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseClicked( MouseEvent e )
-			{
-				// TODO Auto-generated method stub
-				
-			}
-		} );
+		},
+				new PopupMenuListener()
+				{
+
+					@Override
+					public void popupMenuWillBecomeVisible( PopupMenuEvent e )
+					{
+						JComboBox<String> source = (JComboBox<String>) e.getSource();
+
+						List<String> fileNames = WalkSimulatorStateSaver.getSaveFileNames();
+
+						source.removeAllItems();
+
+						for ( String filename : fileNames )
+						{
+							source.addItem( filename );
+						}
+					}
+
+					@Override
+					public void popupMenuWillBecomeInvisible( PopupMenuEvent e )
+					{
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void popupMenuCanceled( PopupMenuEvent e )
+					{
+						// TODO Auto-generated method stub
+
+					}
+				} );
+	}
+
+	private void registerDisplayMouseListeners()
+	{
+		display.addMouseListener( mouseListener );
+		display.addMouseMotionListener( mouseListener );
 	}
 
 	private void resetSimulation()

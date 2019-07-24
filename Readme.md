@@ -14,9 +14,6 @@ Simulation of different objects in a X-Y plane
 - Wall: walkers can't move into a space with a wall
 - Magnet: "attratcs" or "repels" walkers by altering the probability dist of the walker's possilbe moves
 
-
-## Simulation Rules
-
 ## Object Interactions 
 Should be fair (point's order in list shouldn't affect outcome)
 
@@ -27,3 +24,8 @@ Should be fair (point's order in list shouldn't affect outcome)
 |    Magnet                          |    xxx                   |    xxx                   |     Nothing                  |
 
 
+## Other
+
+Current magnet rule
+- Each possible move has a weight (default 1 without magnet interference)
+- Magnet adds k/d^2, split between the X and Y directions

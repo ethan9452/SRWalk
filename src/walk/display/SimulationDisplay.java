@@ -132,7 +132,7 @@ public class SimulationDisplay extends JPanel
 
 	private void paintHeatMap( Graphics graphics )
 	{
-		Map<Point, Double> visitedPoints = simulator.getHeatMapWeightsMap();
+		Map<Point, Double> visitedPoints = simulator.updateAndGetHeatMapWeights();
 
 		for ( Entry<Point, Double> visitedPoint : visitedPoints.entrySet() )
 		{

@@ -7,10 +7,11 @@ public class Magnet extends Point
 
 	private final boolean	isAttractive;
 
-	private final double	k	= 1.;
+	private final double	k	= 10000.;
 
-	public Magnet( boolean isAttractive )
+	public Magnet( int x, int y, boolean isAttractive )
 	{
+		super( x, y );
 		this.isAttractive = isAttractive;
 	}
 

@@ -1,9 +1,10 @@
 package randomprovidor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class IRandomChoiceProvidor
+public abstract class IRandomChoiceProvidor implements Serializable
 {
 	// TODO: this is kind of lame, is there a way to do this automatically ?
 	// Reflection?

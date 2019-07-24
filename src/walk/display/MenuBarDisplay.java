@@ -1,5 +1,6 @@
 package walk.display;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -8,6 +9,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
@@ -19,6 +21,7 @@ import java.util.Stack;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -27,16 +30,17 @@ import javax.swing.JToggleButton;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuListener;
 
 import walk.SimulationObjectType;
 import walk.WalkMain;
 import walk.WalkSimulator;
 
 public class MenuBarDisplay extends JPanel
-{	
+{
 	private static Font				DEFAULT_Font		= new JLabel().getFont();
 	private static Font				SMALLER_FONT		= new Font( DEFAULT_Font.getName(), DEFAULT_Font.getStyle(),
-			(DEFAULT_Font.getSize() - 2) );
+			(DEFAULT_Font.getSize() - 3) );
 
 	private static DecimalFormat	decimalFormatter	= new DecimalFormat( "#.00" );
 
@@ -48,19 +52,23 @@ public class MenuBarDisplay extends JPanel
 	private final int				widthPixels;
 	private final int				heightPixels;
 
-	private JPanel statsPanel;
-	
+	private JPanel					leftPanel;
+	private JPanel					rightPanel;
+
+	private JPanel					statsPanel;
+
 	private JLabel					biggestX;
 	private JLabel					biggestY;
 	private JLabel					smallestX;
 	private JLabel					smallestY;
-	private JLabel					numWalkers;
 	private JLabel					iterCount;
-
 	private JLabel					intendedFps;
 	private JLabel					actualFps;
-	
-	private SimulationObjectType paintBrushObjectType;
+	private JLabel					numWalkers;
+	private JLabel					numWalls;
+	private JLabel					numMagnets;
+
+	private SimulationObjectType	paintBrushObjectType;
 
 	public MenuBarDisplay( WalkMain simulatorMain, WalkSimulator simulator, int widthPixels, int heightPixels )
 	{
@@ -70,28 +78,99 @@ public class MenuBarDisplay extends JPanel
 		this.simulatorMain = simulatorMain;
 		this.simulator = simulator;
 
-		BoxLayout layoutManager = new BoxLayout( this, BoxLayout.PAGE_AXIS );
-		setLayout( layoutManager );
-//		setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
+		GridLayout mainLayoutManager = new GridLayout( 1, 2, 0, 0 );
+		setLayout( mainLayoutManager );
+
+		leftPanel = new JPanel();
+		BoxLayout leftLayoutManager = new BoxLayout( leftPanel, BoxLayout.PAGE_AXIS );
+		leftPanel.setLayout( leftLayoutManager );
+
+		rightPanel = new JPanel();
+		BoxLayout rightLayoutManager = new BoxLayout( rightPanel, BoxLayout.PAGE_AXIS );
+		rightPanel.setLayout( rightLayoutManager );
+
+		add( leftPanel );
+		add( rightPanel );
 
 		biggestX = new JLabel( "Biggest X:" );
 		biggestY = new JLabel( "Biggest Y:" );
 		smallestX = new JLabel( "Smallest X:" );
 		smallestY = new JLabel( "Smallest Y:" );
-		numWalkers = new JLabel( "Num Walkers:" );
 		iterCount = new JLabel( "Iter Count:" );
 
 		intendedFps = new JLabel( "Set FPS:" );
 		actualFps = new JLabel( "Actual FPS:" );
-		
+
+		numWalkers = new JLabel( "Num Walkers:" );
+		numWalls = new JLabel( "Num Walls:" );
+		numMagnets = new JLabel( "Num Magnets:" );
+
 		paintBrushObjectType = SimulationObjectType.NONE;
+
+		registerIndependentComponentsToRightPanel();
 	}
 
-	public void finishDisplaySetting()
+	private JPanel getPanelForSection( MenuBarSection section )
 	{
-		// TODO: this is a hack so that this shit on the bottom doesn't get cut off. (border didn't work well - which is weird)
-//		add( new JPanel() );
+		switch ( section )
+		{
+		case MENU_LEFT:
+			return leftPanel;
 
+		case MENU_RIGHT:
+			return rightPanel;
+
+		default:
+			throw new IllegalArgumentException( "invalid menu seciton " + section );
+		}
+	}
+
+	/**
+	 * Note: For now, these buttons can only alter things in the menuBar object,
+	 * as opposed to the left panel, which is mostly set up in WalkMain and can
+	 * alter its state.
+	 */
+	private void registerIndependentComponentsToRightPanel()
+	{
+		registerPaintBrushChooser();
+	}
+
+	private void registerPaintBrushChooser()
+	{
+		JComboBox<String> brushChooser = new JComboBox<String>( SimulationObjectType.getDisplayNames() );
+		
+		fixCBoxSizing(brushChooser);
+		
+		brushChooser.setSelectedIndex( 0 );
+		brushChooser.addActionListener( new ActionListener()
+		{
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
+				String selectedBrushName = (String) comboBox.getSelectedItem();
+				paintBrushObjectType = SimulationObjectType.displayNameToEnum.get( selectedBrushName );
+			}
+		} );
+
+		rightPanel.add( brushChooser );
+	}
+	
+	private void fixCBoxSizing( JComboBox<?> feckedUpBox )
+	{
+		Dimension oldMaxSize = feckedUpBox.getMaximumSize();
+		feckedUpBox.setMaximumSize( new Dimension( oldMaxSize.width, 20 ) );
+	}
+	
+	public void registerComboBoxWithSubmitButton( String[] options, String label, MenuBarSection section, ActionListener buttonCallback, PopupMenuListener dropDownCallback )
+	{
+		ComboBoxWithSubmitButton thing = new ComboBoxWithSubmitButton(options, label, buttonCallback, dropDownCallback);
+		
+		getPanelForSection( section ).add( thing );
+	}
+
+	public void addSettingsForAllComponentsInHeirarchy()
+	{
 		// Set background color for all children
 		synchronized ( getTreeLock() )
 		{
@@ -121,8 +200,8 @@ public class MenuBarDisplay extends JPanel
 	public void addStatsDisplays()
 	{
 		JPanel statsPanel = new JPanel( new GridLayout( 1, 2, 0, 0 ) );
-//		statsPanel.setBorder( BorderFactory.createEmptyBorder( 0,0,10,0 ) );
-		
+		// statsPanel.setBorder( BorderFactory.createEmptyBorder( 0,0,10,0 ) );
+
 		JPanel left = new JPanel();
 		JPanel right = new JPanel();
 
@@ -130,31 +209,36 @@ public class MenuBarDisplay extends JPanel
 		biggestY.setFont( SMALLER_FONT );
 		smallestX.setFont( SMALLER_FONT );
 		smallestY.setFont( SMALLER_FONT );
-		numWalkers.setFont( SMALLER_FONT );
 		iterCount.setFont( SMALLER_FONT );
 		intendedFps.setFont( SMALLER_FONT );
 		actualFps.setFont( SMALLER_FONT );
+		numWalkers.setFont( SMALLER_FONT );
+		numWalls.setFont( SMALLER_FONT );
+		numMagnets.setFont( SMALLER_FONT );
 
 		left.add( biggestX );
 		left.add( biggestY );
 		left.add( smallestX );
 		left.add( smallestY );
-		left.add( numWalkers );
 		left.add( iterCount );
 
 		right.add( intendedFps );
 		right.add( actualFps );
+		right.add( numWalkers );
+		right.add( numWalls );
+		right.add( numMagnets );
 
 		statsPanel.add( left );
 		statsPanel.add( right );
-		
-		// TODO this is to fit all the labels. maybe can make it more general ifthis probelm comes up a lot
+
+		// TODO this is to fit all the labels. maybe can make it more general
+		// ifthis probelm comes up a lot
 		statsPanel.setPreferredSize( new Dimension( widthPixels, 70 ) );
 
-		add( statsPanel );
-		
+		leftPanel.add( statsPanel );
+
 		this.statsPanel = statsPanel;
-		debugLocationPrint( biggestX );
+		// debugLocationPrint( biggestX );
 	}
 
 	public void updateStatsDisplays()
@@ -163,11 +247,15 @@ public class MenuBarDisplay extends JPanel
 		biggestY.setText( "Biggest Y:" + simulator.getBiggestY() );
 		smallestX.setText( "Smallest X:" + simulator.getSmallestX() );
 		smallestY.setText( "Smallest Y:" + simulator.getSmallestY() );
-		numWalkers.setText( "Num Walkers:" + simulator.getNumWalkers() );
 		iterCount.setText( "Iter Count:" + simulator.getIterCount() );
 
 		intendedFps.setText( "Set FPS: " + decimalFormatter.format( (1000. / simulatorMain.getTimerDelayMs()) ) );
 		actualFps.setText( "Actual FPS: " + decimalFormatter.format( simulator.getActualFps() ) );
+
+		numWalkers.setText( "Num Walkers:" + simulator.getNumWalkers() );
+		numWalls.setText( "Num Walls:" + simulator.getNumWalls() );
+		numMagnets.setText( "Num Magnets:" + simulator.getNumMagnets() );
+
 	}
 
 	public void registerButton( String name, ActionListener buttonCallback )
@@ -176,16 +264,16 @@ public class MenuBarDisplay extends JPanel
 
 		b.setAlignmentX( Component.CENTER_ALIGNMENT );
 
-		add( b );
+		leftPanel.add( b );
 		b.addActionListener( buttonCallback );
 	}
-	
-	public void registerToggleButton( String name , boolean startingState, ActionListener callback )
+
+	public void registerToggleButton( String name, boolean startingState, ActionListener callback )
 	{
-		JToggleButton b = new JToggleButton(name);
+		JToggleButton b = new JToggleButton( name );
 		b.setSelected( startingState );
 		b.setAlignmentX( Component.CENTER_ALIGNMENT );
-		add(b);
+		leftPanel.add( b );
 		b.addActionListener( callback );
 	}
 
@@ -205,15 +293,16 @@ public class MenuBarDisplay extends JPanel
 
 		panel.add( spinner );
 
-		add( panel );
+		leftPanel.add( panel );
 
 	}
 
-	public void registerSubmittableInputField( String buttonName, String labelName, ActionListener buttonCallback )
+	public void registerSubmittableInputField( String buttonName, String labelName, MenuBarSection section,
+			ActionListener buttonCallback )
 	{
 		TextFieldWithSubmitButton b = new TextFieldWithSubmitButton( buttonName, labelName );
 		b.addActionListener( buttonCallback );
-		b.addToPanel( this );
+		b.addToPanel( getPanelForSection( section ) );
 
 	}
 
@@ -233,23 +322,20 @@ public class MenuBarDisplay extends JPanel
 		panel.add( s.getLabel() );
 		panel.add( s.getTextField() );
 
-		add( panel );
-	}
-	
-	public void debugLocationPrint( Component component )
-	{
-		System.out.println( "top left: " + component.getLocation() + " size: " + component.getSize() + " preffered size: " + 
-				component.getPreferredSize() + " min size " + component.getMinimumSize() + " max size " + component.getMaximumSize() );
+		leftPanel.add( panel );
 	}
 
-	
+	public void debugLocationPrint( Component component )
+	{
+		System.out.println(
+				"top left: " + component.getLocation() + " size: " + component.getSize() + " preffered size: " +
+						component.getPreferredSize() + " min size " + component.getMinimumSize() + " max size "
+						+ component.getMaximumSize() );
+	}
+
 	public SimulationObjectType getPaintBrushObjectType()
 	{
 		return paintBrushObjectType;
 	}
 
-//	public void setPaintBrushObjectType( SimulationObjectType paintBrushObjectType )
-//	{
-//		this.paintBrushObjectType = paintBrushObjectType;
-//	}
 }

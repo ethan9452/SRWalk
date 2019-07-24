@@ -27,7 +27,8 @@ public class DisplayFrame extends JFrame
 		// in the JFrame, the menu bar actually takes up some space, so the
 		// context pane is the size we wanna set.
 		this.getContentPane().setPreferredSize( new Dimension( widthPixels, heightPixels ) );
-		pack();
+		pack(); // This sets the JFrame size such that it's content pane (the stuff besides the menu bar) is the preffered size
+		setMinimumSize( getSize() ); 
 
 		setTitle( "walkooo" );
 		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );

@@ -1,9 +1,14 @@
 package randomprovidor;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class RandomChoiceFromDistributionProvidor
+public class RandomChoiceFromDistributionProvidor implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9029851005476229388L;
 	Random random;
 	
 	public RandomChoiceFromDistributionProvidor()

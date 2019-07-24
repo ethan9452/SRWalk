@@ -2,11 +2,16 @@ package walk;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.management.RuntimeErrorException;
 
 import randomprovidor.IRandomChoiceProvidor;
+import randomprovidor.RandomChoiceFromDistributionProvidor;
 
 /**
  * Intended Flow:
@@ -20,23 +25,24 @@ import randomprovidor.IRandomChoiceProvidor;
  */
 public class Walker extends Point
 {
-	public static final List<Point>	ALL_POSSIBLE_MOVE_VECTORS	= new ArrayList<Point>()
-																{
-																	{
-																		add( new Point( 0, 1 ) );
-																		add( new Point( 1, 0 ) );
-																		add( new Point( 0, -1 ) );
-																		add( new Point( -1, 0 ) );
-																	}
-																};
+	public static final List<Point>			ALL_POSSIBLE_MOVE_VECTORS	= new ArrayList<Point>()
+																		{
+																			{
+																				add( new Point( 0, 1 ) );
+																				add( new Point( 1, 0 ) );
+																				add( new Point( 0, -1 ) );
+																				add( new Point( -1, 0 ) );
+																			}
+																		};
 
-	private ArrayListSet<Point>				possibleNextMoves;
+	private Map<Point, java.lang.Double>	possibleNextMoveWeights;
 
 	public Walker( int x, int y )
 	{
 		super( x, y );
 
-		possibleNextMoves = new ArrayListSet<>( ALL_POSSIBLE_MOVE_VECTORS );
+		possibleNextMoveWeights = new LinkedHashMap<>();
+		resetPossibleNextMoves();
 	}
 
 	public Point getPotentialMoveLocation( Point move )
@@ -46,7 +52,7 @@ public class Walker extends Point
 
 	public void removePossibleMove( Point move )
 	{
-		possibleNextMoves.remove( move );
+		possibleNextMoveWeights.remove( move );
 	}
 
 	/**
@@ -54,12 +60,12 @@ public class Walker extends Point
 	 * 
 	 * @param random
 	 */
-	public void moveRandomlyBasedOnPossibleMoves( IRandomChoiceProvidor random )
+	public void moveRandomlyBasedOnPossibleMoves( RandomChoiceFromDistributionProvidor random )
 	{
-		if ( !possibleNextMoves.isEmpty() )
+		if ( !possibleNextMoveWeights.isEmpty() )
 		{
-			final int choiceIdx = random.randomUniformChoice( possibleNextMoves.size() );
-			Point chosenMove = possibleNextMoves.get( choiceIdx );
+			final int choiceIdx = random.randomChoiceFromDist( getPossibleMoveWeights() );
+			Point chosenMove = getNthFromPossibleNextMoves( choiceIdx );
 
 			translate( chosenMove.x, chosenMove.y );
 		}
@@ -67,9 +73,45 @@ public class Walker extends Point
 		resetPossibleNextMoves();
 	}
 
+	private double[] getPossibleMoveWeights()
+	{
+		double[] ret = new double[possibleNextMoveWeights.size()];
+
+		int i = 0;
+		for ( java.lang.Double weight : possibleNextMoveWeights.values() )
+		{
+			ret[i] = weight;
+			i++;
+		}
+
+		return ret;
+	}
+
+	private Point getNthFromPossibleNextMoves( int n )
+	{
+		int i = 0;
+		for ( Point p : possibleNextMoveWeights.keySet() )
+		{
+			if ( n == i )
+			{
+				return p;
+			}
+			i++;
+		}
+		throw new IllegalArgumentException( "n is out of range" );
+	}
+
 	public void resetPossibleNextMoves()
 	{
-		possibleNextMoves.addAll( ALL_POSSIBLE_MOVE_VECTORS );
+		for ( Point vec : ALL_POSSIBLE_MOVE_VECTORS )
+		{
+			possibleNextMoveWeights.put( vec, 1.0 );
+		}
+	}
+	
+	public Map<Point, java.lang.Double> getPossibleNextMoveWeights()
+	{
+		return possibleNextMoveWeights;
 	}
 
 }
