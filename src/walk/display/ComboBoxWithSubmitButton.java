@@ -17,6 +17,8 @@ public class ComboBoxWithSubmitButton extends JPanel
 	public ComboBoxWithSubmitButton( String[] items, String label, ActionListener buttonCallback , PopupMenuListener dropDownCallback)
 	{
 		cBox = new JComboBox<String>( items );
+		cBox.setAlignmentX( JComboBox.LEFT_ALIGNMENT );
+		
 		button = new JButton( label );
 		fixCBoxSizing( cBox );
 		

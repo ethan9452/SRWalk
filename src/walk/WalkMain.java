@@ -29,6 +29,7 @@ import walk.display.JSliderWithTextField;
 import walk.display.MenuBarDisplay;
 import walk.display.SimulationDisplay;
 import walk.display.TextFieldWithSubmitButton;
+import walk.simulator.WalkSimulator;
 
 public class WalkMain implements ActionListener
 {
@@ -298,6 +299,7 @@ public class WalkMain implements ActionListener
 				
 				WalkSimulatorStateSaver.loadSimulationState( parentContainer.getSelectedFile(), simulator );
 				
+				timer.stop();
 				display.repaint();
 				menuBar.repaint();
 			}

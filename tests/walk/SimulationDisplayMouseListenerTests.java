@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import junit.framework.Assert;
 import walk.display.MenuBarDisplay;
 import walk.display.SimulationDisplay;
+import walk.simulator.WalkSimulator;
 
 class SimulationDisplayMouseListenerTests extends SimulationDisplayMouseListener
 {

@@ -1,4 +1,4 @@
-package walk;
+package walk.simulator;
 
 import java.awt.Point;
 import java.io.Serializable;
@@ -11,6 +11,9 @@ import java.util.Map.Entry;
 import randomprovidor.DefaultLibraryRandomChoiceProvidor;
 import randomprovidor.IRandomChoiceProvidor;
 import randomprovidor.RandomChoiceFromDistributionProvidor;
+import walk.Magnet;
+import walk.WalkUtil;
+import walk.Walker;
 
 /**
  * Simulates a point moving randomly in a X-Y cartiensn plane.
@@ -294,7 +297,7 @@ public class WalkSimulator implements Serializable
 		isReset = false;
 	}
 
-	private void makeRandomStep()
+	protected void makeRandomStep()
 	{
 		debugNoCollisionsCheck(); // TODO remove if not debugging
 

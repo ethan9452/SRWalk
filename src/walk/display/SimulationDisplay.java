@@ -19,7 +19,7 @@ import org.ietf.jgss.Oid;
 
 import walk.Magnet;
 import walk.WalkMain;
-import walk.WalkSimulator;
+import walk.simulator.WalkSimulator;
 
 public class SimulationDisplay extends JPanel
 {

@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import walk.config.WalkConfig;
+import walk.simulator.WalkSimulator;
 
 public class WalkSimulatorStateSaver
 {
@@ -19,7 +20,12 @@ public class WalkSimulatorStateSaver
 
 	public static void loadSimulationState( String saveFileName, WalkSimulator stateToOverwrite )
 	{
-		String fullFileName = WalkConfig.SAVED_STATE_DIR + saveFileName + SERIAL_FILE_EXT;
+		loadSimulationState( WalkConfig.SAVED_STATE_DIR, saveFileName, stateToOverwrite );
+	}
+	
+	public static void loadSimulationState( String dir, String saveFileName, WalkSimulator stateToOverwrite )
+	{
+		String fullFileName = dir + saveFileName + SERIAL_FILE_EXT;
 		WalkSimulator loadedState;
 
 		try
@@ -88,9 +94,14 @@ public class WalkSimulatorStateSaver
 
 	public static List<String> getSaveFileNames()
 	{
+		return getSaveFileNames( WalkConfig.SAVED_STATE_DIR );
+	}
+
+	public static List<String> getSaveFileNames( String dir )
+	{
 		List<String> saveFileNames = new ArrayList<>();
 
-		final File folder = new File( WalkConfig.SAVED_STATE_DIR );
+		final File folder = new File( dir );
 
 		for ( final File fileEntry : folder.listFiles() )
 		{

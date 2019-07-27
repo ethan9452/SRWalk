@@ -9,6 +9,7 @@ import java.util.List;
 
 import walk.display.MenuBarDisplay;
 import walk.display.SimulationDisplay;
+import walk.simulator.WalkSimulator;
 
 /**
  * Listens for mouse inputs and performs the corresponding operations on the

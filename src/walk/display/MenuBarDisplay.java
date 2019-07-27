@@ -34,7 +34,7 @@ import javax.swing.event.PopupMenuListener;
 
 import walk.SimulationObjectType;
 import walk.WalkMain;
-import walk.WalkSimulator;
+import walk.simulator.WalkSimulator;
 
 public class MenuBarDisplay extends JPanel
 {
@@ -141,7 +141,8 @@ public class MenuBarDisplay extends JPanel
 		
 		fixCBoxSizing(brushChooser);
 		
-		brushChooser.setSelectedIndex( 0 );
+		brushChooser.setSelectedItem( "None" ); // TODO hacky
+		
 		brushChooser.addActionListener( new ActionListener()
 		{
 			@Override
@@ -162,9 +163,9 @@ public class MenuBarDisplay extends JPanel
 		feckedUpBox.setMaximumSize( new Dimension( oldMaxSize.width, 20 ) );
 	}
 	
-	public void registerComboBoxWithSubmitButton( String[] options, String label, MenuBarSection section, ActionListener buttonCallback, PopupMenuListener dropDownCallback )
+	public void registerComboBoxWithSubmitButton( String[] options, String label, MenuBarSection section, ActionListener actionCallback, PopupMenuListener dropDownCallback )
 	{
-		ComboBoxWithSubmitButton thing = new ComboBoxWithSubmitButton(options, label, buttonCallback, dropDownCallback);
+		ComboBoxWithSubmitButton thing = new ComboBoxWithSubmitButton(options, label, actionCallback, dropDownCallback);
 		
 		getPanelForSection( section ).add( thing );
 	}
