@@ -1,0 +1,8 @@
+,100,1000,10000,100000,
+30kwalkers_wall,22,20,18,18,
+5_walkers,20000,12820,17361,20802,
+stuck_in_box,289,290,241,217,
+walkers_collisions,502,636,616,491,
+walkers_magnets,28,27,25,25,
+walkers_magnets_walls,28,27,26,25,
+walkers_magnets_walls_collisions,36,63,58,64,

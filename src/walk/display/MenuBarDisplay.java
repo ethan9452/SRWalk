@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -138,11 +139,11 @@ public class MenuBarDisplay extends JPanel
 	private void registerPaintBrushChooser()
 	{
 		JComboBox<String> brushChooser = new JComboBox<String>( SimulationObjectType.getDisplayNames() );
-		
-		fixCBoxSizing(brushChooser);
-		
+
+		capComponentHeight( brushChooser );
+
 		brushChooser.setSelectedItem( "None" ); // TODO hacky
-		
+
 		brushChooser.addActionListener( new ActionListener()
 		{
 			@Override
@@ -156,18 +157,36 @@ public class MenuBarDisplay extends JPanel
 
 		rightPanel.add( brushChooser );
 	}
+
+	private void capComponentHeight( Component feckedUpBox )
+	{
+		capComponentHeight( feckedUpBox, 20 );
+	}
 	
-	private void fixCBoxSizing( JComboBox<?> feckedUpBox )
+	private void capComponentHeight( Component feckedUpBox, int height )
 	{
 		Dimension oldMaxSize = feckedUpBox.getMaximumSize();
 		feckedUpBox.setMaximumSize( new Dimension( oldMaxSize.width, 20 ) );
 	}
-	
-	public void registerComboBoxWithSubmitButton( String[] options, String label, MenuBarSection section, ActionListener actionCallback, PopupMenuListener dropDownCallback )
+
+	public void registerComboBoxWithSubmitButton( String[] options, String label, MenuBarSection section,
+			ActionListener actionCallback, PopupMenuListener dropDownCallback )
 	{
-		ComboBoxWithSubmitButton thing = new ComboBoxWithSubmitButton(options, label, actionCallback, dropDownCallback);
-		
+		ComboBoxWithSubmitButton thing = new ComboBoxWithSubmitButton( options, label, actionCallback,
+				dropDownCallback );
+
 		getPanelForSection( section ).add( thing );
+	}
+
+	public void registerStaticText( String msg, MenuBarSection section )
+	{	
+		JTextArea label = new JTextArea(msg);
+		label.setLineWrap( true );
+		label.setWrapStyleWord( true );
+		capComponentHeight( label , 50);
+//		
+		getPanelForSection( section ).add( label );
+		
 	}
 
 	public void addSettingsForAllComponentsInHeirarchy()

@@ -30,6 +30,11 @@ import walk.display.MenuBarDisplay;
 import walk.display.SimulationDisplay;
 import walk.display.TextFieldWithSubmitButton;
 import walk.simulator.WalkSimulator;
+import walk.simulator.WalkSimulatorV2;
+import walk.simulator.WalkSimulatorV3;
+import walk.simulator.WalkSimulatorV4;
+import walk.simulator.WalkSimulatorV5;
+import walk.simulator.WalkSimulatorV6;
 
 public class WalkMain implements ActionListener
 {
@@ -56,9 +61,13 @@ public class WalkMain implements ActionListener
 
 	private boolean							isRenderOn;
 
+	private long							lastTryRenderMs;
+	private static long						MS_PER_FRAME_60_HZ					= 1000 / 60;
+
 	public WalkMain()
 	{
-		simulator = new WalkSimulator();
+		simulator = new WalkSimulatorV6();
+
 		display = new SimulationDisplay( simulator, SIMULATION_DISPLAY_PIXELS, DEFAULT_SIMULATION_DISPLAY_SCALE );
 		menuBar = new MenuBarDisplay( this, simulator, MENU_BAR_WIDTH,
 				Math.max( MENU_BAR_MIN_HEIGHT, SIMULATION_DISPLAY_PIXELS ) );
@@ -67,6 +76,7 @@ public class WalkMain implements ActionListener
 		timer = new Timer( DEFAULT_TIMER_DELAY, this );
 
 		isRenderOn = true;
+		lastTryRenderMs = System.currentTimeMillis();
 
 		EventQueue.invokeLater( () ->
 		{
@@ -293,12 +303,13 @@ public class WalkMain implements ActionListener
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				// TODO getting the ComboBoxWithSubmitButton by reffering to parent seems hacky..
+				// TODO getting the ComboBoxWithSubmitButton by reffering to
+				// parent seems hacky..
 				JButton source = (JButton) e.getSource();
-				ComboBoxWithSubmitButton parentContainer = (ComboBoxWithSubmitButton)source.getParent();
-				
+				ComboBoxWithSubmitButton parentContainer = (ComboBoxWithSubmitButton) source.getParent();
+
 				WalkSimulatorStateSaver.loadSimulationState( parentContainer.getSelectedFile(), simulator );
-				
+
 				timer.stop();
 				display.repaint();
 				menuBar.repaint();
@@ -336,6 +347,9 @@ public class WalkMain implements ActionListener
 
 					}
 				} );
+
+		menuBar.registerStaticText( "Simulation Engine Version: " + simulator.getClass().getSimpleName(),
+				MenuBarSection.MENU_RIGHT );
 	}
 
 	private void registerDisplayMouseListeners()
@@ -391,11 +405,18 @@ public class WalkMain implements ActionListener
 	{
 		simulator.step();
 
-		menuBar.updateStatsDisplays();
+		// No point to render faster than the eye can see
+		if ( System.currentTimeMillis() - lastTryRenderMs > MS_PER_FRAME_60_HZ )
+		{
+			menuBar.updateStatsDisplays();
 
-		display.paintIfTrue( isRenderOn );
+			display.paintIfTrue( isRenderOn );
 
-		menuBar.repaint();
+			menuBar.repaint();
+
+			lastTryRenderMs = System.currentTimeMillis();
+		}
+
 	}
 
 	public int getTimerDelayMs()

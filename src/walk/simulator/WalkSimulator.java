@@ -21,20 +21,24 @@ import walk.Walker;
  * @author ethanlo1
  *
  */
+/**
+ * @author ethanlo1
+ *
+ */
 public class WalkSimulator implements Serializable
 {
 	private static final long						serialVersionUID						= 6550001421005846783L;
 
 	private IRandomChoiceProvidor					random;
-	private RandomChoiceFromDistributionProvidor	randomDist;
+	protected RandomChoiceFromDistributionProvidor	randomDist;
 
-	private List<Walker>							currentWalkers;
-	private List<Magnet>							currentMagnets;
-	private List<Point>								currentWalls;
+	protected List<Walker>							currentWalkers;
+	protected List<Magnet>							currentMagnets;
+	protected List<Point>							currentWalls;
 
 	private int										iterCount;
 
-	private boolean									isCollisionsOn;
+	protected boolean								isCollisionsOn;
 
 	private boolean									isReset;
 
@@ -43,10 +47,10 @@ public class WalkSimulator implements Serializable
 	private Map<Point, Integer>						pointsVisitedCount;
 	private Map<Point, Double>						heatMapWeights;
 
-	private int										biggestX;
-	private int										smallestX;
-	private int										biggestY;
-	private int										smallestY;
+	protected int									biggestX;
+	protected int									smallestX;
+	protected int									biggestY;
+	protected int									smallestY;
 
 	private int										framesToAverageOverForFpsCalculation	= 10;
 	private long									lastFpsMeasureTimeMs;
@@ -76,6 +80,12 @@ public class WalkSimulator implements Serializable
 		this( new DefaultLibraryRandomChoiceProvidor(), new RandomChoiceFromDistributionProvidor() );
 		// this( new DecimalThresholdRandomProvidor() );
 		// this( new ModAlgRandomProvidor() );
+	}
+	
+
+	public void postDeserializationInit()
+	{
+		
 	}
 
 	public void clearAllObjects()
@@ -128,10 +138,10 @@ public class WalkSimulator implements Serializable
 
 	private void resetSimulationStats()
 	{
-		biggestX = 0;
-		biggestY = 0;
-		smallestX = 0;
-		smallestY = 0;
+		biggestX = Integer.MIN_VALUE;
+		biggestY = Integer.MIN_VALUE;
+		smallestX = Integer.MAX_VALUE;
+		smallestY = Integer.MAX_VALUE;
 
 		lastFpsMeasureTimeMs = System.currentTimeMillis();
 		actualFps = 0;
@@ -287,7 +297,7 @@ public class WalkSimulator implements Serializable
 		heatMapWeights = pointsVisitedFractionOfMaxMap;
 	}
 
-	public void step()
+	public final void step()
 	{
 
 		recordCurrentPoint();
@@ -406,7 +416,7 @@ public class WalkSimulator implements Serializable
 
 	}
 
-	private void updateActualFps()
+	protected void updateActualFps()
 	{
 		if ( iterCount % framesToAverageOverForFpsCalculation == 0 )
 		{

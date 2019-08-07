@@ -48,6 +48,8 @@ public class WalkSimulatorStateSaver
 		}
 
 		transferWalkSimulationState( loadedState, stateToOverwrite );
+		
+		stateToOverwrite.postDeserializationInit();
 	}
 
 	private static void transferWalkSimulationState( WalkSimulator source, WalkSimulator destination )
