@@ -87,6 +87,11 @@ public class WalkSimulator implements Serializable
 	{
 		
 	}
+	
+	public void terminateForShutdown()
+	{
+		
+	}
 
 	public void clearAllObjects()
 	{

@@ -112,6 +112,8 @@ public class BenchMarkTestRunner
 
 				runtimesPerFilename.get( filename ).add( runTime );
 				itersCompletedPerFilename.get( filename ).add( i );
+				
+				simulator.terminateForShutdown();
 			}
 		}
 		//

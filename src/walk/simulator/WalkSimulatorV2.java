@@ -137,8 +137,4 @@ public class WalkSimulatorV2 extends WalkSimulator
 
 	}
 	
-	public void terminateForShutdown()
-	{
-		
-	}
-}
+
